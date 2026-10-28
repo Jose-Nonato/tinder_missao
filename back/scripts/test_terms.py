@@ -11,7 +11,7 @@ from app.controllers.auth_controller import register
 from app.core.config import settings
 from app.schemas.auth import RegisterRequest, UserResponse
 
-VERSION = "2026-10-28-draft-1"
+VERSION = "2026-10-28-draft-2"
 BASE = dict(username="consent_test", email="consent@example.test", password="Test-only-123!")
 
 
