@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from bson import ObjectId
 from pymongo import ReturnDocument
 
