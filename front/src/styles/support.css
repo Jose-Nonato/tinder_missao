@@ -3,6 +3,11 @@
 .support-page article > p { line-height: 1.75; }
 .support-page .support-payment { padding: var(--s-6); background: var(--c-surface-2); border-radius: var(--r-lg); }
 .support-payment h2 { margin-top: 0; }
+.support-external { display: grid; justify-items: start; gap: var(--s-3); }
+.support-external .cta { max-width: 100%; padding-block: var(--s-3); text-align: center; cursor: pointer; }
+.support-external .cta:hover { filter: brightness(1.04); }
+.support-external p + p { margin-top: 0; }
+.support-alternative { margin-top: var(--s-6); }
 .support-qr { display: block; width: min(100%, 256px); height: auto; margin-block: var(--s-5); }
 .support-pix { display: grid; gap: var(--s-3); margin-top: var(--s-5); }
 .support-pix label { font-weight: 700; }

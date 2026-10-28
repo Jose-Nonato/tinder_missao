@@ -6,10 +6,11 @@ import { useAuth } from '../auth/AuthContext'
 import { donationConfig } from '../legal/donation'
 import '../styles/support.css'
 
-const { pixKey, qrUrl } = donationConfig(import.meta.env)
+const { donationUrl, pixKey, qrUrl } = donationConfig(import.meta.env)
 
 export default function Support() {
   const { user } = useAuth()
+  const hasPayment = donationUrl || pixKey || qrUrl
   const [feedback, setFeedback] = useState('')
   const [qrFailed, setQrFailed] = useState(false)
   const copy = async () => {
@@ -30,8 +31,14 @@ export default function Support() {
       <p className="support-lead">Boas conexões. Um projeto que podemos manter juntos.</p>
       <p>O Voto a dois é gratuito e sem fins lucrativos. Somos a Ducks tech, um grupo independente de desenvolvimento, sem CNPJ. Sua doação ajuda a pagar a hospedagem e o banco de dados que mantêm o aplicativo no ar.</p>
       <section className="support-payment" aria-labelledby="donation-title">
-        <h2 id="donation-title">{pixKey || qrUrl ? 'Contribua com o projeto' : 'Em breve'}</h2>
-        {!pixKey && !qrUrl && <p>Estamos preparando uma forma de receber seu apoio. Quando estiver pronta, os dados para doação aparecerão aqui. Enquanto isso, aproveite o app: ele continua gratuito.</p>}
+        <h2 id="donation-title">{hasPayment ? 'Contribua com o projeto' : 'Em breve'}</h2>
+        {!hasPayment && <p>Estamos preparando uma forma de receber seu apoio. Quando estiver pronta, os dados para doação aparecerão aqui. Enquanto isso, aproveite o app: ele continua gratuito.</p>}
+        {donationUrl && <div className="support-external">
+          <a className="cta big" href={donationUrl} target="_blank" rel="noopener noreferrer" aria-describedby="donation-new-tab">Apoiar o Voto a dois</a>
+          <p id="donation-new-tab" className="muted">Abre em nova aba.</p>
+          <p>O pagamento é processado por um intermediador de pagamentos. O app não recebe dados de cartão.</p>
+        </div>}
+        {donationUrl && qrUrl && <p className="support-alternative">ou pague com Pix pelo QR code</p>}
         {qrUrl && (qrFailed
           ? <p role="status">Não foi possível carregar o QR code.{pixKey ? ' Use a chave Pix abaixo.' : ' Tente novamente mais tarde.'}</p>
           : <img className="support-qr" src={qrUrl} alt="QR code para doação ao Voto a dois" width="256" height="256" onError={() => setQrFailed(true)} />)}
