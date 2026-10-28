@@ -6,7 +6,7 @@ import Icon from '../components/Icon'
 import ProfileSheet from '../components/ProfileSheet'
 import { Input, Select, Textarea } from '../components/Field'
 
-const MAX_PHOTOS = 6
+const MAX_PHOTOS = 3
 const MIN_AGE = 18
 
 // Data máxima aceita no campo: hoje menos 18 anos (o back valida de novo).
@@ -159,7 +159,7 @@ export default function Profile() {
                   <div className="photo-order"><button type="button" className="secondary" disabled={i === 0 || uploading} aria-label={`Mover foto ${i + 1} para antes`} onClick={() => movePhoto(i, i - 1)}><Icon name="chevron-left" size={18} /></button><button type="button" className="secondary" disabled={i === f.photos.length - 1 || uploading} aria-label={`Mover foto ${i + 1} para depois`} onClick={() => movePhoto(i, i + 1)}><Icon name="chevron-right" size={18} /></button></div>
                 </div>)}
                 {f.photos.length < MAX_PHOTOS && <label className="photo-add profile-upload">
-                  <Icon name="plus" size={28} /><span>{uploading ? 'Enviando…' : 'Adicionar foto'}</span><small>Até {MAX_PHOTOS} fotos</small>
+                  <Icon name="plus" size={28} /><span>{uploading ? 'Enviando…' : 'Adicionar foto'}</span><small>Até {MAX_PHOTOS} fotos · mín. 400 px · até 2 MB</small>
                   <input id="profile-photos" type="file" multiple accept="image/png,image/jpeg,image/gif,image/webp" disabled={uploading} aria-describedby={photoError ? 'photo-error' : undefined} onChange={(e) => { addPhotos(e.target.files); e.target.value = '' }} />
                 </label>}
               </div>

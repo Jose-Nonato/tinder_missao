@@ -12,6 +12,8 @@ async def get_profile(user: dict) -> ProfileRead | None:
 
 async def save_profile(user: dict, data: ProfileData) -> ProfileData:
     for url in data.photos:
+        if url.startswith("http"):
+            continue  # já validado como URL do bucket no schema
         if not (UPLOAD_DIR / url.removeprefix("/uploads/")).is_file():
             raise HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY, f"Foto não encontrada: {url}"

@@ -3,9 +3,10 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.core import storage
 from app.core.age import MAX_AGE, MIN_AGE, age_on
 
-MAX_PHOTOS = 6
+MAX_PHOTOS = 3
 
 
 class Gender(str, Enum):
@@ -48,9 +49,10 @@ class ProfileData(BaseModel):
     @field_validator("photos")
     @classmethod
     def _check_photos(cls, photos: list[str]) -> list[str]:
-        # só aceita arquivos enviados pelo próprio sistema (/uploads/<arquivo>)
+        # só aceita arquivos enviados pelo próprio sistema (/uploads/<arquivo> ou o bucket do Supabase)
         for url in photos:
-            name = url.removeprefix("/uploads/")
+            prefix = storage.public_prefix() if url.startswith("http") and storage.supabase_enabled() else storage.LOCAL_PREFIX
+            name = url.removeprefix(prefix)
             if name == url or not name or "/" in name or "\\" in name or ".." in name:
                 raise ValueError("Foto inválida: envie as imagens pelo upload")
         if len(set(photos)) != len(photos):
