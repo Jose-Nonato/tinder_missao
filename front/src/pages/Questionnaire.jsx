@@ -19,6 +19,7 @@ export default function Questionnaire() {
   const questionRef = useRef(null)
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
+  const [completedTopic, setCompletedTopic] = useState('')
   const queue = useRef(Promise.resolve())
   const revision = useRef(0)
   const dirty = useRef(false)
@@ -62,10 +63,19 @@ export default function Questionnaire() {
     }).finally(() => { if (current === revision.current) setSaving(false) })
   }
 
+  useEffect(() => {
+    if (!completedTopic) return
+    const timer = setTimeout(() => setCompletedTopic(''), 4000)
+    return () => clearTimeout(timer)
+  }, [completedTopic])
+
   const pick = (code, optionId) => {
     const next = { ...chosen, [code]: optionId }
     setChosen(next)
-    persist(next)
+    const topic = questions.find(q => q.code === code)?.topic
+    const siblings = questions.filter(q => q.topic === topic)
+    const newlyComplete = siblings.some(q => !chosen[q.code]) && siblings.every(q => next[q.code])
+    persist(next).then(ok => { if (ok && newlyComplete) setCompletedTopic(topic) })
   }
 
   const save = async (leave = false) => {
@@ -135,6 +145,7 @@ export default function Questionnaire() {
         <span className="muted" aria-live="polite">Pergunta {step + 1} de {questions.length}</span>
         <button disabled={step === questions.length - 1} onClick={() => setStep(step + 1)}>Próxima</button>
       </div>}
+      <div className="topic-confirmation" role="status">{completedTopic && <span key={completedTopic}><Icon name="check" size={18} /> {completedTopic} concluída</span>}</div>
       {error && <p className="error" role="alert">{error}</p>}
       {questions.length > 0 && (
         <div className="sticky-actions q-save">

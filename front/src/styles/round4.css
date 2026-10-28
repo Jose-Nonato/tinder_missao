@@ -1,3 +1,9 @@
 .icebreakers { display: grid; gap: var(--s-3); max-width: 55ch; margin-inline: auto; padding: var(--s-5); }
 .icebreakers h2 { font-size: 1.5rem; }
 .icebreakers .secondary { text-align: left; white-space: normal; height: auto; padding: var(--s-4); }
+.topic-confirmation { min-height: 2rem; color: var(--c-success); }
+.topic-confirmation span { display: inline-flex; gap: var(--s-2); align-items: center; animation: topic-confirm var(--dur-slow) var(--ease); }
+@keyframes topic-confirm { from { opacity: .4; } to { opacity: 1; } }
+.profile-photo { transform-origin: top left; }
+.q-save { flex-wrap: wrap; }
+.q-save .grow { flex-basis: 100%; }

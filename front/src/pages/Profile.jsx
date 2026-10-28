@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, assetUrl } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
@@ -39,6 +39,21 @@ export default function Profile() {
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [photoError, setPhotoError] = useState('')
+  const gallery = useRef(null)
+  const positions = useRef(new Map())
+
+  useLayoutEffect(() => {
+    const previous = positions.current
+    positions.current = new Map()
+    gallery.current?.querySelectorAll('[data-photo]').forEach(el => {
+      const rect = el.getBoundingClientRect()
+      positions.current.set(el.dataset.photo, rect)
+      const from = previous.get(el.dataset.photo)
+      if (from && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        el.animate([{ transform: `translate(${from.left - rect.left}px, ${from.top - rect.top}px) scale(${from.width / rect.width}, ${from.height / rect.height})` }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' })
+      }
+    })
+  }, [f.photos])
 
   useEffect(() => {
     api.myProfile()
@@ -119,8 +134,8 @@ export default function Profile() {
             <section className="card profile-section" aria-labelledby="photos-title">
               <div className="row between"><h2 id="photos-title">Suas fotos</h2><span className="muted">{f.photos.length} / {MAX_PHOTOS}</span></div>
               <p className="muted">A primeira é sua foto principal. Use as setas para organizar a ordem.</p>
-              <div className="profile-gallery">
-                {f.photos.map((url, i) => <div className="profile-photo" key={`${url}-${i}`}>
+              <div className="profile-gallery" ref={gallery}>
+                {f.photos.map((url, i) => <div className="profile-photo" key={url} data-photo={url}>
                   <div className="profile-photo-image"><img src={assetUrl(url)} alt={`Foto ${i + 1}`} /><span className="badge">{i === 0 ? 'Principal' : i + 1}</span>
                   <button type="button" className="photo-remove icon-btn" disabled={uploading} aria-label={`Remover foto ${i + 1}`} onClick={() => removePhoto(i)}><Icon name="x" size={18} /></button></div>
                   <div className="photo-order"><button type="button" className="secondary" disabled={i === 0 || uploading} aria-label={`Mover foto ${i + 1} para antes`} onClick={() => movePhoto(i, i - 1)}><Icon name="chevron-left" size={18} /></button><button type="button" className="secondary" disabled={i === f.photos.length - 1 || uploading} aria-label={`Mover foto ${i + 1} para depois`} onClick={() => movePhoto(i, i + 1)}><Icon name="chevron-right" size={18} /></button></div>
