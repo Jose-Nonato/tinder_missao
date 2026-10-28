@@ -43,10 +43,10 @@ h1, .card-name, .ps-name, .q-question, .match-meta b {
 .deck::before { content: ''; position: absolute; inset: 8px 8px 0; border-radius: var(--r-lg); background: var(--c-brand); transform: rotate(-4deg); z-index: -2; }
 .swipe-card { border-radius: var(--r-lg); }
 .swipe-card.behind { transform: rotate(3deg) scale(.98); filter: brightness(.8); z-index: -1; }
-.card-compat { top: 24px; left: 20px; border-radius: var(--r-sm); padding: 10px 16px; gap: 12px; box-shadow: var(--shadow-2); }
-.card-compat b { font-family: var(--font-display); font-size: 3rem; line-height: 1; }
-.card-compat b small { font-size: 1.5rem; }
-.card-compat > span { font-size: .75rem; line-height: 1.25; font-weight: 700; }
+.card-compat { top: 24px; left: 20px; border-radius: var(--r-pill); padding: 6px 10px; gap: 5px; background: var(--c-photo-soft); color: var(--c-photo-ink); box-shadow: none; }
+.card-compat b { font-size: .875rem; line-height: 1.4; }
+.card-compat b small { font-size: inherit; }
+.card-compat > span { font-size: .75rem; line-height: 1.25; font-weight: 500; }
 .card-overlay { padding: 100px 24px 24px; }
 .card-name { font-size: clamp(2.25rem, 3.5vw, 3rem); line-height: .98; margin-bottom: 12px; }
 .card-age { font-size: .7em; }
@@ -61,8 +61,7 @@ h1, .card-name, .ps-name, .q-question, .match-meta b {
   .discover { gap: 12px; min-height: 570px; }
   .discover-heading { border: 0; padding: 0; }
   .discover-heading p { max-width: none; font-size: .8125rem; }
-  .card-compat { left: 16px; top: 20px; padding: 8px 12px; }
-  .card-compat b { font-size: 2.5rem; }
+  .card-compat { left: 16px; top: 20px; }
   .card-overlay { padding-inline: 18px; }
 }
 
@@ -149,8 +148,67 @@ h1, .card-name, .ps-name, .q-question, .match-meta b {
 }
 
 .q-save { position: static; margin-top: 24px; }
-.match-hero .affinity-score span { font-size: .55rem; }
+.match-hero .affinity-score span { font-size: .6875rem; max-width: 58px; }
 .q-question:focus { outline: none; }
 
 .affinity-score span { max-width: 70px; text-align: center; line-height: 1.1; }
-.match-hero .affinity-score b { font-size: 3rem; }
+.match-hero .affinity-score b { font-size: 2.25rem; }
+.match-hero .affinity-score b small { font-size: 1rem; }
+
+/* Continuous deck motion is driven by rAF, without React renders per pointer move. */
+.swipe-card { transition: none; animation: none; }
+.swipe-card.behind { transform: translateY(12px) scale(.96); filter: none; }
+.deck::before { display: none; }
+.act.chosen { animation: action-press 360ms var(--ease); opacity: 1; }
+@keyframes action-press { 35% { transform: scale(.92); } 75% { transform: scale(1.03); } }
+.ps-info .chip { background: var(--c-surface-2); color: var(--c-text); font-size: .8125rem; }
+
+/* Profile editing: two purposeful columns, one consistent field language. */
+.profile-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--s-5); margin-bottom: var(--s-7); }
+.profile-heading p { margin-top: var(--s-3); max-width: 40ch; }
+.profile-heading .tag { overflow-wrap: anywhere; }
+.profile-fields { border: 0; padding: 0; margin-top: var(--s-5); display: block; }
+.profile-columns { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--s-6); align-items: start; }
+.profile-column { display: grid; gap: var(--s-6); min-width: 0; }
+.profile-editor .profile-section { margin: 0; padding: var(--s-6); gap: var(--s-5); box-shadow: none; }
+.profile-section h2 { font-family: var(--font-display); font-size: 1.75rem; }
+.profile-section > p { font-size: .875rem; line-height: 1.6; }
+.profile-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3); align-items: start; }
+.profile-photo { min-width: 0; }
+.profile-photo-image { position: relative; }
+.profile-photo-image img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: var(--r-sm); }
+.photo-remove { position: absolute; bottom: 8px; right: 8px; color: var(--c-photo-text); background: var(--c-photo-shade); }
+.photo-remove:hover:not(:disabled) { background: var(--c-photo-shade-hover); }
+.photo-order { display: flex; gap: var(--s-1); margin-top: var(--s-2); }
+.photo-order button { flex: 1; padding: 0; min-width: 44px; border-radius: var(--r-sm); }
+.profile-upload { width: 100%; font-size: .8125rem; padding: var(--s-2); background: var(--c-surface-2); }
+.profile-upload small { font-size: .75rem; font-weight: 400; }
+.field { display: flex; flex-direction: column; gap: var(--s-2); min-width: 0; }
+.field > label { flex-direction: row; align-items: baseline; justify-content: space-between; gap: var(--s-2); }
+.field-required { font-size: .6875rem; font-weight: 400; color: var(--c-text-muted); }
+.field > input, .field > select, .field > textarea { border-radius: var(--r-sm); min-width: 0; background: var(--c-bg); }
+.field > select { min-height: 52px; padding-right: var(--s-4); }
+.field > input { min-height: 52px !important; }
+.field [aria-invalid='true'] { border-color: var(--c-danger); }
+.field > small { font-size: .75rem; line-height: 1.5; }
+.field-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); }
+.bio-count { align-self: flex-end; margin-top: calc(-1 * var(--s-3)); color: var(--c-text-muted); font-size: .75rem; font-variant-numeric: tabular-nums; }
+.profile-account button { width: 100%; font-size: .875rem; }
+.profile-save { margin-top: var(--s-6); border: 0; }
+.profile-save .grow { font-size: .8125rem; font-weight: 400; }
+.profile-save .saved { color: var(--c-success); }
+@media (max-width: 760px) {
+  .profile-columns { grid-template-columns: minmax(0, 1fr); }
+  .profile-heading { align-items: flex-start; flex-direction: column; gap: var(--s-3); }
+  .profile-editor .profile-section { padding: var(--s-5); }
+  .profile-save { flex-wrap: nowrap; padding: var(--s-3); }
+  .profile-save button { font-size: .9375rem; padding-inline: var(--s-4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .swipe-card, .swipe-card.behind, .swipe-card.leaving { transform: none !important; }
+  .swipe-card.leaving { opacity: 1; }
+  .act.chosen { animation: action-fade 160ms linear !important; }
+  .act:active:not(:disabled) { transform: none; }
+  .stamp.like, .stamp.pass { transform: none; }
+}
+@keyframes action-fade { from { opacity: .55; } to { opacity: 1; } }
