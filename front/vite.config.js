@@ -6,6 +6,7 @@ import { staticPwa } from './pwa/build.js'
 export default defineConfig({
   plugins: [react(), staticPwa()],
   server: {
+    host: true,
     proxy: {
       '/api': {
         target: process.env.API_PROXY_TARGET ?? 'http://127.0.0.1:8000',
