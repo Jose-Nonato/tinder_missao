@@ -1,0 +1,52 @@
+services:
+  # API FastAPI (inclui o WebSocket do chat)
+  - type: web
+    name: tinder-missao-api
+    runtime: python
+    rootDir: back
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: MONGODB_URL
+        sync: false
+      - key: MONGODB_DB
+        value: tinder_missao
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: photos
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # URL pública do front, ex.: https://tinder-missao.onrender.com
+      - key: CORS_ORIGINS
+        sync: false
+
+  # Front (Vite/React PWA)
+  - type: web
+    name: tinder-missao
+    runtime: static
+    rootDir: front
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache
+    envVars:
+      # URL pública da API, ex.: https://tinder-missao-api.onrender.com (sem barra final)
+      - key: VITE_API_URL
+        sync: false
