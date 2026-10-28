@@ -7,6 +7,7 @@ import Avatar from '../components/Avatar'
 import Icon from '../components/Icon'
 import Sheet from '../components/Sheet'
 import UserActions from '../components/UserActions'
+import { icebreakers } from '../components/icebreakers'
 
 const time = (iso) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 const day = (iso) => new Date(iso).toLocaleDateString('pt-BR')
@@ -66,12 +67,17 @@ function Thread({ other }) {
   const [unavailable, setUnavailable] = useState(false)
   const [text, setText] = useState('')
   const [menu, setMenu] = useState(false)
+  const [suggestions, setSuggestions] = useState([])
+  const composer = useRef(null)
   const scroller = useRef(null)
   const bottom = useRef(null)
   const prevHeight = useRef(null) // preserva a posição ao carregar mensagens antigas
 
   useEffect(() => {
     let cancelled = false
+    api.matches().then(matches => {
+      if (!cancelled) setSuggestions(icebreakers(matches.find(m => m.profile.id === other.id)?.profile.breakdown))
+    }).catch(() => {})
     api.history(other.id)
       .then((h) => {
         if (cancelled) return
@@ -175,7 +181,12 @@ function Thread({ other }) {
         {loading && <p className="center muted">Carregando…</p>}
         {hasMore && <button type="button" className="secondary small center-btn" onClick={loadOlder}>Mensagens anteriores</button>}
         {!loading && messages.length === 0 && (
-          <p className="center muted first-msg">Vocês deram match! Mande a primeira mensagem.</p>
+          <div className="first-msg icebreakers">
+            <h2>Uma conversa começa com curiosidade</h2>
+            <p className="muted">Vocês deram match! {suggestions.length ? 'Escolha uma ideia sobre um tópico em comum e edite do seu jeito.' : 'Que tal se apresentar?'} </p>
+            {suggestions.map(suggestion => <button className="secondary" type="button" key={suggestion} onClick={() => { setText(suggestion); composer.current?.focus() }}>{suggestion}</button>)}
+            {suggestions.length > 0 && <small className="muted">Nada é enviado até você tocar em Enviar.</small>}
+          </div>
         )}
         {messages.map((m, i) => {
           const mine = m.sender_id === me.id
@@ -211,6 +222,7 @@ function Thread({ other }) {
         <label className="sr-only" htmlFor="msg">Mensagem</label>
         <input
           id="msg"
+          ref={composer}
           value={text}
           onChange={(e) => setText(e.target.value)}
           maxLength={1000}
