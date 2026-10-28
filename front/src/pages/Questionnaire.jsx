@@ -4,9 +4,10 @@ import { api, assetUrl } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import Icon from '../components/Icon'
 import { NO_OPINION } from '../constants'
+import { firstPending } from './questionProgress'
 
 export default function Questionnaire() {
-  const { user, refreshUser } = useAuth()
+  const { user, refreshUser, logout } = useAuth()
   const navigate = useNavigate()
   // primeiro acesso: precisa responder tudo para liberar o app
   const required = user.role === 'user' && !user.questionnaire_completed
@@ -18,12 +19,17 @@ export default function Questionnaire() {
   const questionRef = useRef(null)
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
+  const queue = useRef(Promise.resolve())
+  const revision = useRef(0)
+  const dirty = useRef(false)
 
   useEffect(() => {
     Promise.all([api.activeQuestions(), api.myAnswers()])
       .then(([qs, mine]) => {
         setQuestions(qs)
-        setChosen(Object.fromEntries(mine.answers.map((a) => [a.questionId, a.optionId])))
+        const answers = Object.fromEntries(mine.answers.map((a) => [a.questionId, a.optionId]))
+        setChosen(answers)
+        setStep(firstPending(qs, answers))
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
@@ -31,28 +37,44 @@ export default function Questionnaire() {
 
   useEffect(() => { questionRef.current?.focus({ preventScroll: true }) }, [step])
 
-  const pick = (code, optionId) => {
+  useEffect(() => {
+    const warn = e => { if (dirty.current) { e.preventDefault(); e.returnValue = '' } }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [])
+
+  const persist = (next) => {
+    const current = ++revision.current
+    dirty.current = true
     setSaved(false)
-    setChosen({ ...chosen, [code]: optionId })
+    setSaving(true)
+    setError('')
+    const answers = questions.filter(q => next[q.code]).map(q => ({ questionId: q.code, optionId: next[q.code] }))
+    // Serializa snapshots para uma resposta antiga nunca sobrescrever a mais recente.
+    const request = queue.current.then(() => api.saveAnswers(answers))
+    queue.current = request.catch(() => {})
+    return request.then(() => {
+      if (current === revision.current) { dirty.current = false; setSaved(true) }
+      return true
+    }).catch(err => {
+      if (current === revision.current) setError(`Não foi possível salvar. ${err.message} Tente novamente antes de sair.`)
+      return false
+    }).finally(() => { if (current === revision.current) setSaving(false) })
   }
 
-  const save = async () => {
-    setError('')
-    setSaving(true)
-    try {
-      // só envia respostas de perguntas ainda ativas
-      const answers = questions
-        .filter((q) => chosen[q.code])
-        .map((q) => ({ questionId: q.code, optionId: chosen[q.code] }))
-      await api.saveAnswers(answers)
-      await refreshUser()
-      if (required) navigate('/', { replace: true })
-      else setSaved(true)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setSaving(false)
+  const pick = (code, optionId) => {
+    const next = { ...chosen, [code]: optionId }
+    setChosen(next)
+    persist(next)
+  }
+
+  const save = async (leave = false) => {
+    if (!await persist(chosen)) return
+    try { await refreshUser() } catch (err) { setError(err.message); return }
+    if (leave) {
+      try { await logout(); navigate('/login', { replace: true }) } catch (err) { setError(err.message) }
     }
+    else if (questions.every(q => chosen[q.code])) navigate('/', { replace: true })
   }
 
   if (loading) return <div className="skeleton question-skeleton" aria-label="Carregando perguntas" aria-busy="true" />
@@ -62,13 +84,13 @@ export default function Questionnaire() {
     <>
       <h1 className="page-title">Questionário</h1>
       {required && (
-        <p className="notice">Antes de continuar, responda todas as perguntas. Suas escolhas só são enviadas ao salvar.</p>
+        <p className="notice">Antes de continuar, responda todas as perguntas. Cada resposta é salva automaticamente. Você pode parar e retomar depois.</p>
       )}
       {questions.length === 0 && <p>Nenhuma pergunta disponível no momento.</p>}
       {questions.length > 0 && (
         <div className="q-progress">
           <div className="q-progress-text">
-            <span>{answered} de {questions.length} respondidas</span>
+            <span>{answered} de {questions.length} respondidas · Faltam {questions.length - answered}</span>
             {answered === questions.length && <span className="ok"><Icon name="check" size={18} /> Completo</span>}
           </div>
           <div className="meter" role="progressbar" aria-label="Progresso do questionário" aria-valuemin={0} aria-valuemax={questions.length} aria-valuenow={answered}>
@@ -121,9 +143,10 @@ export default function Questionnaire() {
               ? `Faltam ${questions.length - answered} para continuar`
               : 'Pronto para salvar'}
           </span>
-          {saved && <span className="ok" role="status">Salvo!</span>}
-          <button className="big" onClick={save} disabled={saving || (required ? answered < questions.length : answered === 0)}>
-            {saving ? 'Salvando…' : 'Salvar respostas'}
+          <span className="ok" role="status">{saving ? 'Salvando…' : saved ? 'Salvo' : ''}</span>
+          <button className="secondary" onClick={() => save(true)} disabled={saving || answered === 0}>Salvar e continuar depois</button>
+          <button onClick={() => save()} disabled={saving || answered === 0}>
+            {answered === questions.length ? 'Concluir' : 'Salvar agora'}
           </button>
         </div>
       )}
