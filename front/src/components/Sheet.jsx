@@ -7,6 +7,7 @@ import Icon from './Icon'
 export default function Sheet({ title, onClose, children, size = 'md', hideTitle = false }) {
   const ref = useRef(null)
   const panelRef = useRef(null)
+  const backdropPress = useRef(false)
 
   useEffect(() => {
     const dialog = ref.current
@@ -21,9 +22,9 @@ export default function Sheet({ title, onClose, children, size = 'md', hideTitle
     }
   }, [])
 
-  // clique no fundo escurecido (fora do conteúdo) fecha
+  // Abrir um popover pode mover o alvo do pointerup; só um clique iniciado no fundo fecha.
   const onBackdrop = (e) => {
-    if (e.target === ref.current) onClose()
+    if (backdropPress.current && e.target === ref.current) onClose()
   }
 
   // O navegador dispara "close" de forma assíncrona. No modo de desenvolvimento do React o efeito
@@ -40,6 +41,7 @@ export default function Sheet({ title, onClose, children, size = 'md', hideTitle
       aria-label={title}
       onClose={onNativeClose}
       onCancel={(e) => { e.preventDefault(); onClose() }}
+      onPointerDown={(e) => { backdropPress.current = e.target === ref.current }}
       onClick={onBackdrop}
     >
       <div className="sheet-panel" ref={panelRef} tabIndex={-1}>

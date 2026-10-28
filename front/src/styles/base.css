@@ -368,3 +368,46 @@ a.cta.big { min-height: 52px; padding-inline: var(--s-6); }
   border-radius: var(--r-sm);
   font-size: 0.9375rem;
 }
+
+/* Ações terciárias: texto com alvo confortável, sem disputar o CTA principal. */
+a.btn-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  max-width: 100%;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-sm);
+  color: var(--c-text-muted);
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+a.link-chip {
+  padding-inline: var(--s-2);
+  background: var(--c-surface-2);
+  border-radius: var(--r-pill);
+}
+a.link-support {
+  color: var(--c-soft-text);
+  background: var(--c-soft-bg);
+}
+@media (hover: hover) {
+  a.btn-text:hover {
+    color: var(--c-text);
+    background: var(--c-surface-2);
+    text-decoration: underline;
+  }
+  a.link-chip:hover { background: var(--c-border); }
+  a.link-support:hover { background: var(--c-soft-bg); color: var(--c-soft-text); }
+}
+a.btn-text:focus-visible {
+  outline: 3px solid var(--c-focus);
+  outline-offset: 3px;
+  text-decoration: underline;
+}
+a.btn-text:active { background: var(--c-border); color: var(--c-text); }
+a.link-support:active { background: var(--c-brand); color: var(--c-on-brand); }

@@ -1,0 +1,57 @@
+/* O desktop mantém a marca editorial; no celular, a tarefa vem primeiro. */
+.auth-tagline-mobile { display: none; }
+
+@media (max-width: 640px) {
+  .auth-page.auth-login {
+    justify-content: flex-start;
+    gap: var(--s-7);
+    padding: calc(var(--safe-top) + var(--s-6)) max(var(--s-6), var(--safe-right))
+      calc(var(--safe-bottom) + var(--s-6)) max(var(--s-6), var(--safe-left));
+  }
+  .auth-login .auth-brand {
+    width: 100%;
+    max-width: 420px;
+    align-self: center;
+    align-items: flex-start;
+    gap: var(--s-2);
+    padding: 0;
+    background: transparent;
+    color: var(--c-text);
+    text-align: left;
+  }
+  .auth-login .logo-mark { width: 36px; height: 36px; }
+  .auth-login .logo-text { font-size: 1.125rem; }
+  .auth-login .auth-tagline { display: none; }
+  .auth-login .auth-tagline-mobile {
+    display: block;
+    font-size: .875rem;
+    line-height: 1.5;
+    color: var(--c-text-muted);
+  }
+  .auth-login .auth-card-wrap {
+    animation: login-mobile-in var(--dur-slow) var(--ease);
+  }
+  .auth-login .card.auth { padding: 0 0 var(--s-5); gap: var(--s-4); }
+  .auth-login .card.auth h1 { font-size: 2.75rem; margin-bottom: var(--s-2); }
+  .auth-login input { scroll-margin-block: var(--s-6); }
+  .auth-login button.big {
+    min-height: 56px;
+    margin-top: var(--s-2);
+    background: var(--c-brand);
+    color: var(--c-on-brand);
+    border-radius: var(--r-md);
+    scroll-margin-block: var(--s-6);
+  }
+  .auth-login button.big:hover:not(:disabled) { background: var(--c-brand-light); }
+  .auth-login .auth-links { font-size: .875rem; color: var(--c-text-muted); }
+  .auth-login .auth-links a { font-weight: 600; }
+  .auth-login .auth-links + .auth-links { margin-top: calc(-1 * var(--s-3)); }
+}
+
+@keyframes login-mobile-in {
+  from { transform: translateY(6px); }
+  to { transform: translateY(0); }
+}
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+  .auth-login .auth-card-wrap { animation: none; }
+}

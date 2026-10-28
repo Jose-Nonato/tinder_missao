@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     await client.close()
 
 
-app = FastAPI(title="Tinder Missão API", lifespan=lifespan)
+app = FastAPI(title="Voto a dois API", lifespan=lifespan)
 if settings.cors_origins:
     # Necessário quando o front fica em outro domínio (ex.: Vercel) e usa VITE_API_URL
     app.add_middleware(

@@ -36,6 +36,8 @@ class UserModel:
         email: str,
         password_hash: str,
         role: Role = Role.USER,
+        *,
+        terms_version: str | None = None,
     ) -> dict:
         doc = {
             "username": username,
@@ -44,6 +46,8 @@ class UserModel:
             "role": role.value,
             "created_at": datetime.now(timezone.utc),
         }
+        if terms_version is not None:
+            doc.update(terms_accepted_at=datetime.now(timezone.utc), terms_version=terms_version)
         try:
             result = await cls._col().insert_one(doc)
         except DuplicateKeyError as exc:

@@ -1,3 +1,4 @@
+import { Radio } from '../components/form/Controls'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, assetUrl } from '../api/client'
@@ -116,8 +117,7 @@ export default function Questionnaire() {
           <div className="options" role="radiogroup" aria-label={q.text}>
             {q.options.map((o) => (
               <label key={o.id} className={chosen[q.code] === o.id ? 'opt selected' : 'opt'}>
-                <input
-                  type="radio"
+                <Radio
                   name={q.code}
                   checked={chosen[q.code] === o.id}
                   onChange={() => pick(q.code, o.id)}
@@ -129,8 +129,7 @@ export default function Questionnaire() {
               </label>
             ))}
             <label className={chosen[q.code] === NO_OPINION ? 'opt none selected' : 'opt none'}>
-              <input
-                type="radio"
+              <Radio
                 name={q.code}
                 checked={chosen[q.code] === NO_OPINION}
                 onChange={() => pick(q.code, NO_OPINION)}

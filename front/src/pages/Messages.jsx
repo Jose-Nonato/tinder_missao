@@ -1,3 +1,4 @@
+import { TextInput } from '../components/form/Controls'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/client'
@@ -226,7 +227,7 @@ function Thread({ other }) {
       {error && <p className="error pad" role="alert">{error}</p>}
       <form className="composer" onSubmit={submit}>
         <label className="sr-only" htmlFor="msg">Mensagem</label>
-        <input
+        <TextInput
           id="msg"
           ref={composer}
           value={text}

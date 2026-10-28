@@ -1,0 +1,64 @@
+.app-input { appearance: none; border-radius: var(--r-sm) !important; }
+input[type='number'] { appearance: textfield; }
+input::-webkit-inner-spin-button, input::-webkit-outer-spin-button { appearance: none; margin: 0; }
+input:autofill { background: var(--c-surface-2); color: var(--c-text); }
+input:-webkit-autofill { -webkit-text-fill-color: var(--c-text); box-shadow: inset 0 0 0 100px var(--c-surface-2); }
+.app-select { min-width: 0; }
+.select-trigger { display: flex; justify-content: space-between; width: 100%; gap: var(--s-3); min-height: 52px; padding: var(--s-3) var(--s-4); border: 1.5px solid var(--c-border-strong); border-radius: var(--r-sm); background: var(--c-bg); color: var(--c-text); font-weight: 400; text-align: left; }
+.select-trigger > span { flex: 1; }
+.select-trigger[data-placeholder] { color: var(--c-text-muted); }
+.app-select[data-invalid] .select-trigger { border-color: var(--c-danger); }
+.form-popover { z-index: 100; background: var(--c-surface); color: var(--c-text); box-shadow: var(--shadow-3); border-radius: var(--r-md); overflow: auto; max-height: min(420px, var(--available-height)); min-width: var(--trigger-width); }
+.form-listbox { position: relative; padding: var(--s-2); outline: none; overflow: auto; max-height: inherit; }
+.form-option { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); min-height: 48px; padding: var(--s-3); border-radius: var(--r-sm); cursor: pointer; outline: none; }
+.form-option[data-focused] { background: var(--c-surface-2); outline: 2px solid var(--c-focus); outline-offset: -2px; }
+.form-option[data-selected] { background: var(--c-brand); color: var(--c-on-brand); font-weight: 700; }
+.form-option[data-disabled] { opacity: .5; cursor: not-allowed; }
+.date-input-row { position: relative; }
+.date-input-row input { padding-right: 56px !important; min-height: 52px !important; background: var(--c-bg); }
+.date-trigger { position: absolute; right: var(--s-1); top: var(--s-1); }
+.calendar-dialog { padding: var(--s-4); width: 352px; max-width: 100%; outline: none; }
+.calendar-title, .calendar-navigation { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); }
+.calendar-navigation h2 { font: 600 1rem var(--font); }
+.calendar-jump { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s-2); margin-block: var(--s-2) var(--s-3); }
+.calendar-jump .select-trigger { padding-inline: var(--s-3); }
+.react-aria-CalendarGrid { width: 100%; border-collapse: collapse; }
+.react-aria-CalendarGrid th { font-size: .75rem; color: var(--c-text-muted); padding-block: var(--s-2); }
+.react-aria-CalendarGrid td { padding: 0; }
+.react-aria-CalendarCell { display: grid; place-items: center; min-width: 44px; min-height: 44px; border-radius: var(--r-sm); cursor: pointer; font-variant-numeric: tabular-nums; }
+.react-aria-CalendarCell[data-outside-month] { visibility: hidden; }
+.react-aria-CalendarCell[data-disabled] { opacity: .35; cursor: not-allowed; }
+.react-aria-CalendarCell[data-hovered] { background: var(--c-surface-2); }
+.react-aria-CalendarCell[data-selected] { background: var(--c-brand); color: var(--c-on-brand); font-weight: 700; }
+.react-aria-CalendarCell[data-focus-visible] { outline: 2px solid var(--c-focus); outline-offset: -2px; }
+.calendar-help { font-size: .75rem; margin-top: var(--s-3); text-align: center; }
+input.choice-input { appearance: none; display: inline-grid; place-content: center; width: 24px; height: 24px; border: 2px solid var(--c-border-strong); background: var(--c-surface); border-radius: 6px; cursor: pointer; flex-shrink: 0; }
+input.choice-input:checked { background: var(--c-brand); border-color: var(--c-on-brand); color: var(--c-on-brand); }
+input.choice-input::before { content: ''; width: 12px; height: 7px; border: solid currentColor; border-width: 0 0 2px 2px; transform: rotate(-45deg) translateY(-2px); visibility: hidden; }
+input.choice-input:checked::before { visibility: visible; }
+input.choice-input[type='radio'] { border-radius: 50%; }
+input.choice-input[type='radio']::before { width: 10px; height: 10px; border: 0; border-radius: 50%; background: currentColor; transform: none; }
+input.switch-input { width: 44px; border-radius: var(--r-pill); justify-content: start; padding: 2px; }
+input.switch-input::before { visibility: visible; width: 16px; height: 16px; border: 0; border-radius: 50%; background: var(--c-text-muted); transform: none; }
+input.switch-input:checked::before { background: var(--c-on-brand); transform: translateX(18px); }
+label:has(> .choice-input) { min-height: 44px; cursor: pointer; }
+.choice-input:disabled { opacity: .5; cursor: not-allowed; }
+.file-upload { position: relative; min-height: 44px; cursor: pointer; }
+.file-upload input[type='file'] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.file-upload:focus-within { outline: 2px solid var(--c-focus); outline-offset: 3px; }
+.file-upload:has(input:disabled) { opacity: .5; cursor: not-allowed; }
+@media (max-width: 600px) {
+  .form-popover { position: fixed !important; inset: auto 0 0 !important; width: 100%; min-width: 0; max-height: 70dvh !important; border-radius: var(--r-xl) var(--r-xl) 0 0; padding-bottom: max(var(--s-4), env(safe-area-inset-bottom)); }
+  .form-listbox { max-height: 65dvh; }
+  .calendar-dialog { width: 100%; max-width: 420px; margin-inline: auto; }
+  .react-aria-CalendarCell { min-height: 46px; }
+}
+@media (forced-colors: active) {
+  input.choice-input { appearance: auto; }
+  .form-option[data-selected], .react-aria-CalendarCell[data-selected] { outline: 2px solid Highlight; }
+}
+/* App tables have generous padding; the calendar needs seven equal touch columns. */
+.react-aria-CalendarGrid { table-layout: fixed; min-width: 0; }
+.react-aria-CalendarGrid th, .react-aria-CalendarGrid td { padding-inline: 0; border: 0; text-align: center; }
+.react-aria-CalendarGrid tr { border: 0; }
+.form-label { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-2); font-size: .875rem; font-weight: 600; }

@@ -53,6 +53,8 @@ class SeedTest(unittest.IsolatedAsyncioTestCase):
         async for u in self.db.users.find():
             ProfileData.model_validate(u["profile"])
             self.assertNotEqual(u["role"], "admin")
+            self.assertEqual(u["terms_version"], seed.TERMS_VERSION)
+            self.assertIsNotNone(u["terms_accepted_at"])
             self.assertTrue(all((seed.UPLOAD_DIR / p.removeprefix("/uploads/")).is_file() for p in u["profile"]["photos"]))
             if u["email"] == "questionario@exemplo.test":
                 self.assertFalse(u["questionnaire_completed"])
@@ -123,6 +125,17 @@ class SeedTest(unittest.IsolatedAsyncioTestCase):
             if collection != "swipes":
                 self.assertEqual(await self.db[collection].count_documents({}), 0)
         self.assertEqual(list(seed.UPLOAD_DIR.iterdir()), [sentinel])
+
+    async def test_reset_removes_legacy_seed_only(self):
+        self.assertEqual(seed.SEED, "voto-a-dois-demo-v1")
+        photo = "seed-missao-v1-old.svg"
+        (seed.UPLOAD_DIR / photo).write_text("old")
+        await self.db.users.insert_one({"email": "old@example.test", "username": "old", "role": "user", "seed": "missao-demo-v1", "profile": {"photos": ["/uploads/" + photo]}})
+        await self.db.questions.insert_one({"code": "seed-missao-v1-q01", "seed": "missao-demo-v1"})
+        await seed.reset(self.db)
+        self.assertEqual(await self.db.users.count_documents({}), 0)
+        self.assertEqual(await self.db.questions.count_documents({}), 0)
+        self.assertFalse((seed.UPLOAD_DIR / photo).exists())
 
     async def test_collision_does_not_overwrite_existing_user(self):
         await self.db.users.insert_one({"email": "teste@exemplo.test", "username": "existing", "role": "admin"})

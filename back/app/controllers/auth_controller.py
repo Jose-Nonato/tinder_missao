@@ -76,6 +76,7 @@ async def register(data: RegisterRequest) -> UserResponse:
             username=data.username,
             email=data.email.lower(),
             password_hash=security.hash_password(data.password),
+            terms_version=data.terms_version,
         )
     except EmailOrUsernameTaken:
         raise HTTPException(status.HTTP_409_CONFLICT, "Email ou username já cadastrado")

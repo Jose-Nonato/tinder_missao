@@ -1,3 +1,4 @@
+import { TextInput } from '../../components/form/Controls'
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
 
@@ -28,7 +29,7 @@ function IssuedLink({ link }) {
     <div className="issued-link">
       <b>Link gerado — entregue-o somente à pessoa, depois de confirmar quem ela é.</b>
       <div className="row">
-        <input readOnly value={url} onFocus={(e) => e.target.select()} />
+        <TextInput aria-label="Link de redefinição" readOnly value={url} onFocus={(e) => e.target.select()} />
         <button type="button" onClick={copy}>{copied ? 'Copiado!' : 'Copiar'}</button>
       </div>
       <small className="muted">

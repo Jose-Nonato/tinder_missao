@@ -1,3 +1,4 @@
+import { TextInput } from '../components/form/Controls'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
@@ -51,7 +52,7 @@ export default function ForgotPassword() {
           com você, para confirmarmos que é você mesmo.
         </p>
         <label>Email da conta
-          <input
+          <TextInput
             type="email"
             inputMode="email"
             autoComplete="email"
@@ -62,7 +63,7 @@ export default function ForgotPassword() {
           />
         </label>
         <label>Como podemos falar com você? <small className="muted">(WhatsApp, telefone…)</small>
-          <input
+          <TextInput
             value={contact}
             onChange={(e) => setContact(e.target.value)}
             maxLength={200}

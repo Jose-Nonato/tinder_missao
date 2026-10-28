@@ -64,6 +64,7 @@ function buildNav(user, { unread, pendingResets }) {
         { to: '/', label: 'Início', icon: 'home', end: true },
         { to: '/questionnaire', label: 'Questionário', icon: 'clipboard' },
         { to: '/profile', label: 'Meu perfil', icon: 'user' },
+        { to: '/apoie', label: 'Apoie o projeto', icon: 'heart' },
       ],
     }
   }
@@ -79,6 +80,7 @@ function buildNav(user, { unread, pendingResets }) {
       { to: '/questionnaire', label: 'Questionário', icon: 'clipboard' },
       { to: '/safety', label: 'Segurança', icon: 'shield' },
       { to: '/blocked', label: 'Bloqueados', icon: 'ban' },
+      { to: '/apoie', label: 'Apoie o projeto', icon: 'heart' },
     ],
   }
 }
@@ -114,7 +116,7 @@ function MoreSheet({ user, items, onClose, onLogout }) {
       <ul className="more-list">
         {items.map((item) => (
           <li key={item.to}>
-            <NavLink to={item.to} end={item.end} className={({ isActive }) => `more-item${isActive ? ' active' : ''}`} onClick={onClose}>
+            <NavLink to={item.to} end={item.end} className={({ isActive }) => `more-item${item.to === '/apoie' ? ' link-support' : ''}${isActive ? ' active' : ''}`} onClick={onClose}>
               <Icon name={item.icon} />
               <span>{item.label}</span>
             </NavLink>
@@ -197,7 +199,7 @@ export function Layout() {
         {!locked && (
           <nav aria-label="Principal" className="side-nav">
             {allItems.map((item) => (
-              <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `side-item${isActive ? ' active' : ''}`}>
+              <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `side-item${item.to === '/apoie' ? ' link-support' : ''}${isActive ? ' active' : ''}`}>
                 <Icon name={item.icon} />
                 <span>{item.label}</span>
                 <NavBadge count={item.badge} />
