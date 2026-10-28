@@ -4,6 +4,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import AuthShell from '../components/AuthShell'
 import '../styles/login-mobile.css'
+import Icon from '../components/Icon'
 import PasswordInput from '../components/PasswordInput'
 
 export default function Login() {
@@ -58,7 +59,7 @@ export default function Login() {
         {error && <p className="error" role="alert">{error}</p>}
         <button className="big" disabled={busy}>{busy ? 'Entrando…' : 'Entrar'}</button>
         <p className="auth-links">
-          <Link to="/forgot-password">Esqueci minha senha</Link>
+          <Link className="btn-text" to="/forgot-password"><Icon name="key" size={16} />Esqueci minha senha</Link>
         </p>
         <p className="auth-links">Não tem conta? <Link to="/register">Cadastre-se</Link></p>
       </form>
