@@ -13,7 +13,15 @@ class Settings(BaseSettings):
     # Validade do link de redefinição de senha gerado pelo admin
     reset_token_minutes: int = 60
     upload_dir: str = "uploads"
-    max_upload_mb: int = 5
+    max_upload_mb: int = 2
+    # Menor lado aceito (px) nas fotos de perfil
+    min_photo_px: int = 400
+    # Supabase Storage (opcional): com URL e service key definidos, os uploads vão para o bucket
+    supabase_url: str | None = None
+    supabase_service_key: str | None = None
+    supabase_bucket: str = "photos"
+    # Origens permitidas por CORS, separadas por vírgula (ex.: https://meuapp.vercel.app)
+    cors_origins: str | None = None
     # Admin inicial, criado no startup se os três estiverem definidos
     admin_username: str | None = None
     admin_email: str | None = None

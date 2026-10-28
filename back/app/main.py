@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.controllers.upload_controller import UPLOAD_DIR
+from app.core.config import settings
 from app.core.database import client, init_indexes
 from app.core.seed import seed_admin
 from app.routes import auth_routes, chat_routes, match_routes, moderation_routes, profile_routes, question_routes, recovery_routes, safety_routes, upload_routes, user_routes
@@ -18,6 +20,14 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Tinder Missão API", lifespan=lifespan)
+if settings.cors_origins:
+    # Necessário quando o front fica em outro domínio (ex.: Vercel) e usa VITE_API_URL
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[o.strip() for o in settings.cors_origins.split(",") if o.strip()],
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 app.include_router(auth_routes.router)
 app.include_router(user_routes.router)
 app.include_router(question_routes.router)
