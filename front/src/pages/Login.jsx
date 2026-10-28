@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import AuthShell from '../components/AuthShell'
+import '../styles/login-mobile.css'
 import PasswordInput from '../components/PasswordInput'
 
 export default function Login() {
@@ -31,7 +32,7 @@ export default function Login() {
   }
 
   return (
-    <AuthShell>
+    <AuthShell compactMobile>
       <form className="card auth" onSubmit={submit} noValidate={false}>
         <h1>Entrar</h1>
         {flash && <p className="ok" role="status">{flash}</p>}
