@@ -64,6 +64,7 @@ function buildNav(user, { unread, pendingResets }) {
         { to: '/', label: 'Início', icon: 'home', end: true },
         { to: '/questionnaire', label: 'Questionário', icon: 'clipboard' },
         { to: '/profile', label: 'Meu perfil', icon: 'user' },
+        { to: '/apoie', label: 'Apoie o projeto', icon: 'heart' },
       ],
     }
   }
@@ -79,6 +80,7 @@ function buildNav(user, { unread, pendingResets }) {
       { to: '/questionnaire', label: 'Questionário', icon: 'clipboard' },
       { to: '/safety', label: 'Segurança', icon: 'shield' },
       { to: '/blocked', label: 'Bloqueados', icon: 'ban' },
+      { to: '/apoie', label: 'Apoie o projeto', icon: 'heart' },
     ],
   }
 }

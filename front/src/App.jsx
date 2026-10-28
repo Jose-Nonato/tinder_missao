@@ -12,6 +12,7 @@ import Messages from './pages/Messages'
 import ForgotPassword from './pages/ForgotPassword'
 import Login from './pages/Login'
 import Legal from './pages/Legal'
+import Support from './pages/Support'
 import Questionnaire from './pages/Questionnaire'
 import Register from './pages/Register'
 import ResetPassword from './pages/ResetPassword'
@@ -26,6 +27,7 @@ export default function App() {
       <AuthProvider>
         <ChatProvider>
         <Routes>
+          <Route path="/apoie" element={<Support />} />
           <Route path="/termos" element={<Legal />} />
           <Route path="/privacidade" element={<Legal privacy />} />
           <Route path="/login" element={<Login />} />
