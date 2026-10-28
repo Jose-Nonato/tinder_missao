@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 
 export function staticPwa() {
   return {
-    name: 'missao-static-pwa',
+    name: 'voto-a-dois-static-pwa',
     apply: 'build',
     transformIndexHtml() {
       return [{ tag: 'link', attrs: { rel: 'manifest', href: '/manifest.webmanifest' }, injectTo: 'head' }]
@@ -13,7 +13,8 @@ export function staticPwa() {
       const tokens = read('../src/styles/tokens.css')
       const color = name => tokens.match(new RegExp(`--${name}:\\s*([^;]+)`))[1]
       const manifest = JSON.stringify({
-        id: '/', name: 'Tinder Missão', short_name: 'Missão', lang: 'pt-BR',
+        id: '/', name: 'Voto a dois', short_name: 'Voto a dois', lang: 'pt-BR',
+        description: 'Voto a dois: conexões por afinidade, em um projeto independente e gratuito.',
         start_url: '/', scope: '/', display: 'standalone',
         theme_color: color('c-brand'), background_color: color('c-bg'),
         icons: [
@@ -25,7 +26,7 @@ export function staticPwa() {
       const offline = read('./offline.html').replace('/* DESIGN_TOKENS */', tokens)
       this.emitFile({ type: 'asset', fileName: 'manifest.webmanifest', source: manifest })
       this.emitFile({ type: 'asset', fileName: 'offline.html', source: offline })
-      const files = ['/index.html', '/offline.html', '/manifest.webmanifest', '/favicon.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png', '/icons/apple-touch-icon.png',
+      const files = ['/index.html', '/offline.html', '/manifest.webmanifest', '/favicon.svg', '/icons/brand.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png', '/icons/apple-touch-icon.png',
         ...Object.keys(bundle).filter(name => name.startsWith('assets/')).map(name => `/${name}`)]
       const hash = createHash('sha256').update(JSON.stringify(files) + offline + manifest + read('./sw.js') + read('../index.html'))
       for (const file of files.filter(file => file.startsWith('/icons/') || file === '/favicon.svg')) {

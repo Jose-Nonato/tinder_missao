@@ -1,16 +1,16 @@
-# React + Vite
+# Voto a dois
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicativo gratuito de relacionamento por afinidade, mantido pela Ducks tech, grupo independente de desenvolvimento, sem fins lucrativos e sem vínculo partidário.
 
-Currently, two official plugins are available:
+Contato: duckstech@hotmail.com.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Desenvolvimento
 
-## React Compiler
+Use Node arm64: `export PATH=/opt/homebrew/bin:$PATH`.
+Na pasta `front`, execute `npm install` e `npm run dev`. O proxy de `/api` encaminha ao backend local. Veja `.env.example` para configuração.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Validação: `npm run build`, `npm run lint` e `node --test test/*.test.js`.
 
-## Expanding the Oxlint configuration
+## Marca provisória
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+O wordmark fica em `src/components/Logo.jsx`. O símbolo tipográfico V2 fica em `public/icons/brand.svg`, com cópia em `public/favicon.svg`. Ao escolher o logo definitivo, atualize esses SVGs e os PNGs de `public/icons` (192, 512, maskable 512 e Apple 180 px). Preserve a área segura do ícone maskable. O manifesto é gerado em `pwa/build.js`.

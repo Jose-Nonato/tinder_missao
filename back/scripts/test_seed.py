@@ -126,6 +126,17 @@ class SeedTest(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(await self.db[collection].count_documents({}), 0)
         self.assertEqual(list(seed.UPLOAD_DIR.iterdir()), [sentinel])
 
+    async def test_reset_removes_legacy_seed_only(self):
+        self.assertEqual(seed.SEED, "voto-a-dois-demo-v1")
+        photo = "seed-missao-v1-old.svg"
+        (seed.UPLOAD_DIR / photo).write_text("old")
+        await self.db.users.insert_one({"email": "old@example.test", "username": "old", "role": "user", "seed": "missao-demo-v1", "profile": {"photos": ["/uploads/" + photo]}})
+        await self.db.questions.insert_one({"code": "seed-missao-v1-q01", "seed": "missao-demo-v1"})
+        await seed.reset(self.db)
+        self.assertEqual(await self.db.users.count_documents({}), 0)
+        self.assertEqual(await self.db.questions.count_documents({}), 0)
+        self.assertFalse((seed.UPLOAD_DIR / photo).exists())
+
     async def test_collision_does_not_overwrite_existing_user(self):
         await self.db.users.insert_one({"email": "teste@exemplo.test", "username": "existing", "role": "admin"})
         with self.assertRaises(ValueError):

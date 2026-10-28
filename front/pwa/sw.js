@@ -1,5 +1,5 @@
 // Substituições feitas exclusivamente no build; nenhum cache de dados em runtime.
-const CACHE = 'missao-shell-__CACHE_VERSION__'
+const CACHE = 'voto-a-dois-shell-__CACHE_VERSION__'
 const SHELL = __SHELL_FILES__
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)))
@@ -7,7 +7,7 @@ self.addEventListener('install', event => {
 // Sem skipWaiting: abas abertas continuam usando sua versão até serem fechadas.
 self.addEventListener('activate', event => {
   event.waitUntil(caches.keys().then(keys => Promise.all(keys
-    .filter(key => key.startsWith('missao-shell-') && key !== CACHE)
+    .filter(key => (key.startsWith('voto-a-dois-shell-') || key.startsWith('missao-shell-')) && key !== CACHE)
     .map(key => caches.delete(key)))))
 })
 self.addEventListener('fetch', event => {

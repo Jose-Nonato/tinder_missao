@@ -17,10 +17,12 @@ from app.core.terms import TERMS_VERSION
 from app.schemas.profile import ProfileData
 from app.schemas.question import QuestionCreate
 
-SEED = "missao-demo-v1"
+SEED = "voto-a-dois-demo-v1"
+LEGACY_SEED = "missao-demo-v1"
 PASSWORD = "Teste@123"
 UPLOAD_DIR = Path(settings.upload_dir)
-FILE_PREFIX = "seed-missao-v1-"
+FILE_PREFIX = "seed-voto-a-dois-v1-"
+LEGACY_FILE_PREFIX = "seed-missao-v1-"
 
 # A escala usa igualdade de alternativa e pesos, como o algoritmo atual (não distância ordinal).
 SCALE = ["Concordo totalmente", "Concordo parcialmente", "Discordo parcialmente", "Discordo totalmente"]
@@ -48,7 +50,7 @@ QUESTIONS = [
     ("Corrupção e instituições", 4, "Regras de transparência sobre gastos públicos devem alcançar também partidos e campanhas eleitorais."),
     ("Participação política", 4, "Plebiscitos e referendos devem ser usados com mais frequência em decisões nacionais."),
     ("Participação política", 3, "O voto deve ser facultativo para todas as pessoas adultas."),
-    ("Participação política", 3, "Participar de ações e debates do movimento Missão deve fazer parte da minha rotina."),
+    ("Participação política", 3, "Participar de iniciativas comunitárias e debates públicos deve fazer parte da minha rotina."),
 ]
 
 # nome, username, idade, gênero, interesse, cidade, estado, profissão, bio
@@ -114,7 +116,7 @@ def avatar(person, index):
 
 async def populate(db):
     people = PEOPLE + ACCOUNTS
-    codes = [f"seed-missao-v1-q{i:02d}" for i in range(1, len(QUESTIONS) + 1)]
+    codes = [f"seed-voto-a-dois-v1-q{i:02d}" for i in range(1, len(QUESTIONS) + 1)]
     # Não assumir propriedade de contas/perguntas existentes só pelo nome ou domínio.
     for person in people:
         existing = await db.users.find_one({"$or": [{"email": email_for(person)}, {"username": person[1]}]})
@@ -185,16 +187,16 @@ async def populate(db):
 
 
 async def reset(db):
-    users = await db.users.find({"seed": SEED, "role": "user"}).to_list(None)
+    users = await db.users.find({"seed": {"$in": [SEED, LEGACY_SEED]}, "role": "user"}).to_list(None)
     ids = [u["_id"] for u in users]
     photos = {p for u in users for p in u.get("profile", {}).get("photos", [])}
     for collection, fields in RELATED_FIELDS.items():
         await db[collection].delete_many({"$or": [{field: {"$in": ids + [str(i) for i in ids]}} for field in fields]})
-    await db.users.delete_many({"_id": {"$in": ids}, "seed": SEED, "role": "user"})
-    questions = await db.questions.delete_many({"seed": SEED})
+    await db.users.delete_many({"_id": {"$in": ids}, "seed": {"$in": [SEED, LEGACY_SEED]}, "role": "user"})
+    questions = await db.questions.delete_many({"seed": {"$in": [SEED, LEGACY_SEED]}})
     for photo in photos:
         filename = photo.removeprefix("/uploads/")
-        if filename.startswith(FILE_PREFIX) and Path(filename).name == filename and not await db.users.find_one({"profile.photos": photo}):
+        if filename.startswith((FILE_PREFIX, LEGACY_FILE_PREFIX)) and Path(filename).name == filename and not await db.users.find_one({"profile.photos": photo}):
             (UPLOAD_DIR / filename).unlink(missing_ok=True)
     print(f"Seed removido: {len(ids)} contas e {questions.deleted_count} perguntas; admin e dados sem marca preservados.")
 
