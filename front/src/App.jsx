@@ -4,6 +4,7 @@ import { ChatProvider } from './chat/ChatContext'
 import { Layout, RequireAuth, RequireProfile, RequireQuestionnaire } from './components/Layout'
 import Profile from './pages/Profile'
 import Blocked from './pages/Blocked'
+import Safety from './pages/Safety'
 import Discover from './pages/Discover'
 import Home from './pages/Home'
 import Matches from './pages/Matches'
@@ -38,6 +39,7 @@ export default function App() {
                   <Route element={<RequireAuth role="user" />}>
                     <Route path="/discover" element={<Discover />} />
                     <Route path="/matches" element={<Matches />} />
+                    <Route path="/safety" element={<Safety />} />
                     <Route path="/blocked" element={<Blocked />} />
                     <Route path="/messages" element={<Messages />} />
                     <Route path="/messages/:userId" element={<Messages />} />

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, assetUrl } from '../api/client'
 import Icon from '../components/Icon'
+import EmptyIllustration from '../components/EmptyIllustration'
 import ProfileSheet from '../components/ProfileSheet'
 
 export default function Matches() {
@@ -28,7 +29,7 @@ export default function Matches() {
         </ul>
       ) : matches.length === 0 && !error ? (
         <div className="empty-state">
-          <span className="empty-ico"><Icon name="heart" size={36} /></span>
+          <EmptyIllustration />
           <h2>Nenhum match ainda</h2>
           <p>Quando você e outra pessoa se curtirem, o match aparece aqui.</p>
           <Link to="/discover" className="cta">Descobrir pessoas</Link>

@@ -28,6 +28,9 @@ const PATHS = {
   check: <path d="M20 6 9 17l-5-5" />,
   'check-check': <path d="M18 6 7 17l-5-5M22 10l-7.5 7.5L13 16" />,
   send: <path d="m22 2-7 20-4-9-9-4ZM22 2 11 13" />,
+  'arrow-right': <path d="m12 5 7 7-7 7M5 12h14" />,
+  'chevron-left': <path d="m15 18-6-6 6-6" />,
+  'chevron-right': <path d="m9 6 6 6-6 6" />,
   'arrow-left': <path d="m12 19-7-7 7-7M19 12H5" />,
   info: (
     <>

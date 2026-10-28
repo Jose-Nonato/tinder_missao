@@ -1,9 +1,10 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { staticPwa } from './pwa/build.js'
 
 // O front chama /api/* e o Vite encaminha para o FastAPI (evita CORS no dev).
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), staticPwa()],
   server: {
     proxy: {
       '/api': {

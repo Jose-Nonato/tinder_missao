@@ -48,6 +48,24 @@ logs/
 .DS_Store
 Thumbs.db
 
-# ---------- Claude Code ----------
-# configurações pessoais da máquina (as skills em .claude/skills continuam versionadas)
-.claude/settings.local.json
+# ---------- ferramentas de agente / IA ----------
+.claude/
+.codex/
+.gemini/
+.cursor/
+.overclock/
+.overclock-app/
+.agents/
+.aider*
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+TASK/
+
+# ---------- documentação gerada (README.md continua versionado) ----------
+docs/
+doc/
+ONBOARDING.md
+*.md
+!README.md
+!**/README.md

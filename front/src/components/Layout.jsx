@@ -6,6 +6,8 @@ import { useChat } from '../chat/ChatContext'
 import Icon from './Icon'
 import Logo, { LogoMark } from './Logo'
 import Sheet from './Sheet'
+import MessageNotice from './MessageNotice'
+import InstallInvite from './InstallInvite'
 
 // Etapas obrigatórias para usuários comuns (admins ficam de fora):
 // 1) responder o questionário, 2) completar o perfil.
@@ -41,6 +43,7 @@ const TITLES = {
   '/profile': 'Meu perfil',
   '/questionnaire': 'Questionário',
   '/blocked': 'Bloqueados',
+  '/safety': 'Central de segurança',
   '/admin/questions': 'Perguntas',
   '/admin/users': 'Usuários',
   '/admin/reports': 'Denúncias',
@@ -74,6 +77,7 @@ function buildNav(user, { unread, pendingResets }) {
     secondary: [
       { to: '/', label: 'Início', icon: 'home', end: true },
       { to: '/questionnaire', label: 'Questionário', icon: 'clipboard' },
+      { to: '/safety', label: 'Segurança', icon: 'shield' },
       { to: '/blocked', label: 'Bloqueados', icon: 'ban' },
     ],
   }
@@ -155,6 +159,11 @@ export function Layout() {
       return
     }
     mainRef.current?.focus({ preventScroll: true })
+    const animation = mainRef.current?.animate(
+      [{ opacity: 0.45 }, { opacity: 1 }],
+      { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180 },
+    )
+    return () => animation?.cancel()
   }, [focusKey])
 
   // "Mais" fica ativo quando a página atual é uma das rotas que moram nele
@@ -206,6 +215,7 @@ export function Layout() {
 
       <main id="main" className="app-main" ref={mainRef} tabIndex={-1}>
         <Outlet />
+        <InstallInvite />
       </main>
 
       {/* celular e tablet: barra de abas (no máximo 5 itens, sempre com ícone + texto) */}
@@ -233,6 +243,7 @@ export function Layout() {
         </nav>
       )}
 
+      <MessageNotice />
       {moreOpen && (
         <MoreSheet user={user} items={nav.secondary} onClose={() => setMoreOpen(false)} onLogout={doLogout} />
       )}

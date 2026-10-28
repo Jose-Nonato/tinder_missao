@@ -1,0 +1,26 @@
+.icebreakers { display: grid; gap: var(--s-3); max-width: 55ch; margin-inline: auto; padding: var(--s-5); }
+.icebreakers h2 { font-size: 1.5rem; }
+.icebreakers .secondary { text-align: left; white-space: normal; height: auto; padding: var(--s-4); }
+.topic-confirmation { min-height: 2rem; color: var(--c-success); }
+.topic-confirmation span { display: inline-flex; gap: var(--s-2); align-items: center; animation: topic-confirm var(--dur-slow) var(--ease); }
+@keyframes topic-confirm { from { opacity: .4; } to { opacity: 1; } }
+.profile-photo { transform-origin: top left; }
+.q-save { flex-wrap: wrap; }
+.q-save .grow { flex-basis: 100%; }
+.profile-preview-action { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); margin-bottom: var(--s-6); }
+.safety-page { max-width: 68ch; }
+.safety-page .lead { font-size: 1.25rem; margin-bottom: var(--s-7); }
+.safety-page section { padding-block: var(--s-6); border-top: 1px solid var(--c-border); }
+.safety-page h2 { margin-bottom: var(--s-3); }
+.safety-page p { line-height: 1.65; margin-bottom: var(--s-4); }
+.safety-page .row { flex-wrap: wrap; }
+.message-notice { position: fixed; z-index: calc(var(--z-nav) + 1); top: calc(var(--topbar-h) + var(--safe-top) + var(--s-3)); right: var(--s-4); left: var(--s-4); pointer-events: none; }
+.notice-content { display: flex; align-items: center; gap: var(--s-3); max-width: 32rem; margin-left: auto; padding: var(--s-3); background: var(--c-surface); color: var(--c-text); box-shadow: var(--shadow-3); border-radius: var(--r-md); pointer-events: auto; }
+.notice-content span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.unread-divider { text-align: center; color: var(--c-soft-text); background: var(--c-soft-bg); padding: var(--s-2); margin-block: var(--s-4); border-radius: var(--r-sm); font-size: .875rem; }
+@media (min-width: 1024px) { .message-notice { left: auto; top: var(--s-4); } }
+
+.install-invite { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-7); padding-block: var(--s-5); border-top: 1px solid var(--c-border); }
+.install-copy { flex: 1; min-width: 12rem; }
+.install-copy p { margin: var(--s-1) 0 0; color: var(--c-text-muted); font-size: .875rem; line-height: 1.5; }
+.install-actions { display: flex; flex-wrap: wrap; gap: var(--s-2); }

@@ -335,7 +335,7 @@ a.cta:active {
   border-radius: var(--r-md);
   background: var(--c-soft-bg);
   color: var(--c-soft-text);
-  border-left: 4px solid var(--c-brand);
+  border: 1px solid var(--c-border);
 }
 .quote {
   padding: var(--s-2) var(--s-3);
@@ -353,4 +353,18 @@ a.cta:active {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Detalhes nativos acompanham a marca e o tema. */
+::selection { background: var(--c-brand); color: var(--c-on-brand); }
+html { scrollbar-color: var(--c-border-strong) var(--c-bg); }
+input, textarea { caret-color: var(--c-focus); }
+:where(input, select, textarea, button, a) { -webkit-tap-highlight-color: transparent; }
+a.cta { transition: transform var(--dur-fast) var(--ease), background-color var(--dur-fast); }
+a.cta.big { min-height: 52px; padding-inline: var(--s-6); }
+.error[role='alert'] {
+  padding: var(--s-3) var(--s-4);
+  background: var(--c-danger-bg);
+  border-radius: var(--r-sm);
+  font-size: 0.9375rem;
 }

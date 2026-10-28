@@ -6,7 +6,7 @@ export default function AuthShell({ children }) {
     <main className="auth-page" id="main">
       <div className="auth-brand">
         <Logo size={44} />
-        <p className="auth-tagline">Conexões que começam pelo que você pensa.</p>
+        <p className="auth-tagline">Conexões que começam pelo que você <em>pensa.</em></p>
       </div>
       <div className="auth-card-wrap">{children}</div>
     </main>

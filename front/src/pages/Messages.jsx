@@ -7,6 +7,7 @@ import Avatar from '../components/Avatar'
 import Icon from '../components/Icon'
 import Sheet from '../components/Sheet'
 import UserActions from '../components/UserActions'
+import { icebreakers } from '../components/icebreakers'
 
 const time = (iso) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 const day = (iso) => new Date(iso).toLocaleDateString('pt-BR')
@@ -66,15 +67,23 @@ function Thread({ other }) {
   const [unavailable, setUnavailable] = useState(false)
   const [text, setText] = useState('')
   const [menu, setMenu] = useState(false)
+  const [suggestions, setSuggestions] = useState([])
+  const composer = useRef(null)
+  const follow = useRef(true)
+  const [firstUnread, setFirstUnread] = useState(null)
   const scroller = useRef(null)
   const bottom = useRef(null)
   const prevHeight = useRef(null) // preserva a posição ao carregar mensagens antigas
 
   useEffect(() => {
     let cancelled = false
+    api.matches().then(matches => {
+      if (!cancelled) setSuggestions(icebreakers(matches.find(m => m.profile.id === other.id)?.profile.breakdown))
+    }).catch(() => {})
     api.history(other.id)
       .then((h) => {
         if (cancelled) return
+        setFirstUnread(h.messages.find(m => m.sender_id === other.id && !m.read_at)?.id ?? null)
         setMessages(h.messages)
         setHasMore(h.has_more)
         api.markRead(other.id).catch(() => {})
@@ -89,6 +98,7 @@ function Thread({ other }) {
     if (ev.type === 'message') {
       const m = ev.message
       if (m.sender_id !== other.id && m.recipient_id !== other.id) return
+      if (m.sender_id === other.id) setFirstUnread(id => id ?? m.id)
       setMessages((list) => {
         if (list.some((x) => x.id === m.id)) return list
         // eco da minha própria mensagem otimista: troca a pendente pela definitiva
@@ -112,7 +122,7 @@ function Thread({ other }) {
     if (prevHeight.current != null) {
       el.scrollTop = el.scrollHeight - prevHeight.current
       prevHeight.current = null
-    } else {
+    } else if (follow.current) {
       bottom.current?.scrollIntoView({ block: 'end' })
     }
   }, [messages])
@@ -133,6 +143,7 @@ function Thread({ other }) {
     setError('')
     try {
       const clientId = chat.send(other.id, body)
+      follow.current = true
       setMessages((list) => [...list, {
         id: clientId, client_id: clientId, sender_id: me.id, recipient_id: other.id,
         text: body, created_at: new Date().toISOString(), read_at: null, pending: true,
@@ -171,17 +182,23 @@ function Thread({ other }) {
         </button>
       </header>
 
-      <div className="messages" ref={scroller}>
+      <div className="messages" ref={scroller} onScroll={e => { const el = e.currentTarget; follow.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80 }}>
         {loading && <p className="center muted">Carregando…</p>}
         {hasMore && <button type="button" className="secondary small center-btn" onClick={loadOlder}>Mensagens anteriores</button>}
         {!loading && messages.length === 0 && (
-          <p className="center muted first-msg">Vocês deram match! Mande a primeira mensagem.</p>
+          <div className="first-msg icebreakers">
+            <h2>Uma conversa começa com curiosidade</h2>
+            <p className="muted">Vocês deram match! {suggestions.length ? 'Escolha uma ideia sobre um tópico em comum e edite do seu jeito.' : 'Que tal se apresentar?'} </p>
+            {suggestions.map(suggestion => <button className="secondary" type="button" key={suggestion} onClick={() => { setText(suggestion); composer.current?.focus() }}>{suggestion}</button>)}
+            {suggestions.length > 0 && <small className="muted">Nada é enviado até você tocar em Enviar.</small>}
+          </div>
         )}
         {messages.map((m, i) => {
           const mine = m.sender_id === me.id
           const newDay = i === 0 || day(messages[i - 1].created_at) !== day(m.created_at)
           return (
             <div key={m.id}>
+              {m.id === firstUnread && <div className="unread-divider" role="separator" aria-label="Novas mensagens">Novas mensagens</div>}
               {newDay && <div className="day">{sameDay(m.created_at) ? 'Hoje' : day(m.created_at)}</div>}
               <div className={`bubble${mine ? ' mine' : ''}`}>
                 <span className="bubble-text">{m.text}</span>
@@ -211,6 +228,7 @@ function Thread({ other }) {
         <label className="sr-only" htmlFor="msg">Mensagem</label>
         <input
           id="msg"
+          ref={composer}
           value={text}
           onChange={(e) => setText(e.target.value)}
           maxLength={1000}

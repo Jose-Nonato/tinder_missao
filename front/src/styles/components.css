@@ -10,11 +10,10 @@
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: var(--r-lg);
-  box-shadow: var(--shadow-1);
 }
 @media (min-width: 720px) {
   .card {
-    padding: var(--s-5);
+    padding: var(--s-6);
   }
 }
 
@@ -80,6 +79,7 @@ img.avatar {
 }
 
 .tag {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: var(--s-1);
@@ -118,8 +118,8 @@ img.avatar {
   box-shadow: var(--shadow-1);
 }
 .chip.dark {
-  background: rgba(10, 10, 10, 0.72);
-  color: #fff;
+  background: var(--c-photo-shade);
+  color: var(--c-photo-text);
 }
 
 /* ---------- abas segmentadas (filtros) ---------- */
@@ -177,6 +177,7 @@ button.tab.active .count {
 }
 .sheet::backdrop {
   background: var(--c-scrim);
+  animation: content-in var(--dur) var(--ease);
 }
 .sheet[open] {
   display: flex;
@@ -292,11 +293,11 @@ button.tab.active .count {
   flex: 1;
   height: 4px;
   border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
+  background: var(--c-photo-track);
+  box-shadow: 0 0 0 1px var(--c-photo-ring);
 }
 .photo-bars span.on {
-  background: #fff;
+  background: var(--c-photo-text);
 }
 .photo-zone {
   position: absolute;
@@ -329,7 +330,7 @@ button.tab.active .count {
   background: var(--gradient-brand);
 }
 .photo-empty .avatar {
-  background: rgba(18, 18, 18, 0.12);
+  background: var(--c-avatar-tint);
   width: 120px;
   height: 120px;
   font-size: 3.5rem;
@@ -361,6 +362,7 @@ button.tab.active .count {
   padding-top: var(--s-3);
   border-top: 1px solid var(--c-border);
   font-size: 0.9375rem;
+  animation: detail-in var(--dur) var(--ease);
 }
 .compat-details h4 {
   margin: var(--s-3) 0 var(--s-1);
@@ -372,6 +374,8 @@ button.tab.active .count {
   list-style: none;
 }
 .compat-details li {
+  color: var(--c-text);
+  font-weight: 400;
   display: grid;
   grid-template-columns: 22px 1fr;
   gap: var(--s-2);
@@ -435,8 +439,9 @@ button.tab.active .count {
   padding: var(--s-7) var(--s-5);
   text-align: center;
   background: var(--c-surface);
-  border: 1px dashed var(--c-border-strong);
+  border: 1px solid var(--c-border);
   border-radius: var(--r-xl);
+  padding-block: var(--s-8);
 }
 .empty-state p {
   max-width: 44ch;
@@ -580,3 +585,12 @@ td.actions {
     display: none;
   }
 }
+
+/* Revelação breve, sem animar cada seção de formulários longos. */
+@keyframes content-in { from { opacity: 0.35; } }
+@keyframes detail-in { from { opacity: 0.35; transform: translateY(6px); } }
+@keyframes meter-in { from { transform: scaleX(0); } }
+.ps-info .meter > div { transform-origin: left; animation: meter-in var(--dur-slow) var(--ease); }
+.empty-state > .cta, .empty-actions { margin-top: var(--s-2); }
+.card > h2 { margin-bottom: var(--s-1); }
+.match-tile { animation: content-in var(--dur-slow) var(--ease); }

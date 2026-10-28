@@ -7,9 +7,12 @@ import Icon from '../components/Icon'
 import { PhotoStack } from '../components/PhotoGallery'
 import ProfileSheet from '../components/ProfileSheet'
 import Sheet from '../components/Sheet'
+import AffinityScore from '../components/AffinityScore'
+import EmptyIllustration from '../components/EmptyIllustration'
+import { springStep, swipeDirection } from '../components/swipeMotion'
+import { topicAgreement } from '../components/topicAgreement'
 
-const SWIPE_DISTANCE = 110 // px arrastados para valer como curtir/passar
-const FLY_MS = 240
+const FLY_MS = 360
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -17,7 +20,9 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 // setas do teclado: gesto nunca é o único caminho.
 function SwipeCard({ profile, leaving, disabled, onSwipe, onInfo }) {
   const [photo, setPhoto] = useState(0)
-  const [drag, setDrag] = useState(null) // { x, y } enquanto o dedo está arrastando
+  const card = useRef(null)
+  const frame = useRef(0)
+  const motion = useRef({ x: 0, y: 0, velocity: 0 })
   const start = useRef(null)
   const moved = useRef(false)
 
@@ -25,16 +30,66 @@ function SwipeCard({ profile, leaving, disabled, onSwipe, onInfo }) {
   const place = [profile.city, profile.state].filter(Boolean).join(', ')
   const work = profile.profession || profile.university
 
-  const flyX = leaving ? (leaving === 'like' ? 1 : -1) * window.innerWidth * 1.2 : 0
-  const x = leaving ? flyX : drag?.x ?? 0
-  const y = leaving ? -30 : (drag?.y ?? 0) * 0.15
-  const likeOpacity = Math.min(1, Math.max(0, x / 90))
-  const passOpacity = Math.min(1, Math.max(0, -x / 90))
+  const paint = (x, y = 0, progress = Math.min(1, Math.abs(x) / 220)) => {
+    const el = card.current
+    if (!el) return
+    const reduce = reducedMotion()
+    el.style.transform = reduce ? 'none' : `translate3d(${x}px, ${y}px, 0) rotate(${x / 24}deg)`
+    el.style.setProperty('--like-opacity', Math.min(1, Math.max(0, x / 90)))
+    el.style.setProperty('--pass-opacity', Math.min(1, Math.max(0, -x / 90)))
+    const behind = el.parentElement.querySelector('.behind')
+    if (behind) behind.style.transform = reduce ? 'none' : `translateY(${12 * (1 - progress)}px) scale(${0.96 + progress * 0.04})`
+  }
+  const settle = () => {
+    cancelAnimationFrame(frame.current)
+    const el = card.current
+    el?.classList.remove('dragging')
+    if (reducedMotion()) { motion.current = { x: 0, y: 0, velocity: 0 }; paint(0); return }
+    let spring = { x: motion.current.x, v: motion.current.velocity * 1000 }
+    const y = motion.current.y
+    const initialX = Math.abs(spring.x) || 1
+    let last = performance.now()
+    const tick = (now) => {
+      spring = springStep(spring, Math.min((now - last) / 1000, 1 / 30))
+      last = now
+      motion.current.x = spring.x
+      paint(spring.x, y * Math.min(1, Math.abs(spring.x) / initialX))
+      if (Math.abs(spring.x) > 0.1 || Math.abs(spring.v) > 0.1) frame.current = requestAnimationFrame(tick)
+      else { paint(0); motion.current = { x: 0, y: 0, velocity: 0 }; el.style.willChange = '' }
+    }
+    frame.current = requestAnimationFrame(tick)
+  }
+
+  useEffect(() => {
+    const el = card.current
+    cancelAnimationFrame(frame.current)
+    if (!leaving) { motion.current = { x: 0, y: 0, velocity: 0 }; paint(0); el.style.opacity = '1'; el.style.willChange = ''; return }
+    start.current = null
+    el.classList.remove('dragging')
+    el.style.willChange = 'transform, opacity'
+    const from = { ...motion.current }
+    const direction = leaving === 'like' ? 1 : -1
+    const target = direction * (window.innerWidth + el.offsetWidth)
+    const duration = reducedMotion() ? 160 : Math.max(220, FLY_MS - Math.abs(from.velocity) * 55)
+    const began = performance.now()
+    const tick = (now) => {
+      const t = Math.min(1, (now - began) / duration)
+      const eased = 1 - (1 - t) ** 2
+      if (reducedMotion()) { paint(direction * 90); el.style.opacity = String(1 - t) }
+      else paint(from.x + (target - from.x) * eased, from.y - 35 * eased, 1)
+      if (t < 1) frame.current = requestAnimationFrame(tick)
+      else el.style.willChange = ''
+    }
+    frame.current = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame.current)
+  }, [leaving])
+  useEffect(() => () => cancelAnimationFrame(frame.current), [])
 
   const onPointerDown = (e) => {
-    if (disabled || e.target.closest('[data-no-drag]')) return
+    if (disabled || start.current || e.target.closest('[data-no-drag]')) return
     if (e.pointerType === 'mouse' && e.button !== 0) return
-    start.current = { x: e.clientX, y: e.clientY, t: performance.now() }
+    cancelAnimationFrame(frame.current)
+    start.current = { x: e.clientX - motion.current.x, y: e.clientY, lastX: e.clientX, t: performance.now() }
     moved.current = false
     e.currentTarget.setPointerCapture(e.pointerId)
   }
@@ -43,33 +98,34 @@ function SwipeCard({ profile, leaving, disabled, onSwipe, onInfo }) {
     if (!s) return
     const dx = e.clientX - s.x
     const dy = e.clientY - s.y
-    if (!moved.current && Math.hypot(dx, dy) < 8) return // limiar: evita arrastes acidentais
+    if (!moved.current && Math.hypot(dx, dy) < 8) return
     moved.current = true
-    setDrag({ x: dx, y: dy })
+    const now = performance.now()
+    motion.current = { x: dx, y: dy * 0.15, velocity: (e.clientX - s.lastX) / Math.max(1, now - s.t) }
+    s.lastX = e.clientX; s.t = now
+    card.current.classList.add('dragging')
+    card.current.style.willChange = 'transform'
+    cancelAnimationFrame(frame.current)
+    frame.current = requestAnimationFrame(() => paint(motion.current.x, motion.current.y))
   }
   const onPointerUp = (e) => {
     const s = start.current
     start.current = null
     if (!s) return
-    const dx = e.clientX - s.x
     if (!moved.current) {
-      // toque simples: laterais trocam de foto (como nos stories)
       const rect = e.currentTarget.getBoundingClientRect()
       const rel = (e.clientX - rect.left) / rect.width
       if (rel < 0.4) setPhoto((p) => Math.max(0, p - 1))
-      else if (rel > 0.6) setPhoto((p) => Math.min(count - 1, p + 1))
+      else if (rel > 0.6) setPhoto((p) => Math.max(0, Math.min(count - 1, p + 1)))
+      settle()
       return
     }
-    const velocity = Math.abs(dx) / Math.max(1, performance.now() - s.t)
-    setDrag(null)
-    if (Math.abs(dx) > SWIPE_DISTANCE || (velocity > 0.6 && Math.abs(dx) > 40)) {
-      onSwipe(dx > 0 ? 'like' : 'pass')
-    }
+    const velocity = performance.now() - s.t > 100 ? 0 : motion.current.velocity
+    const direction = swipeDirection(motion.current.x, velocity)
+    if (direction) onSwipe(direction)
+    else settle()
   }
-  const onPointerCancel = () => {
-    start.current = null
-    setDrag(null)
-  }
+  const onPointerCancel = () => { start.current = null; settle() }
   const onKeyDown = (e) => {
     if (disabled) return
     if (e.key === 'ArrowRight') { e.preventDefault(); onSwipe('like') }
@@ -79,12 +135,14 @@ function SwipeCard({ profile, leaving, disabled, onSwipe, onInfo }) {
 
   return (
     <div
-      className={`swipe-card${drag ? ' dragging' : ''}`}
-      style={{ transform: `translate3d(${x}px, ${y}px, 0) rotate(${x / 18}deg)` }}
+      ref={card}
+      className={`swipe-card${leaving ? ' leaving' : ''}`}
+      aria-busy={disabled}
       tabIndex={0}
       role="group"
       aria-roledescription="cartão de perfil"
       aria-label={`${profile.username}${profile.age != null ? `, ${profile.age} anos` : ''}. ${profile.compatibility}% compatível. Setas: direita curte, esquerda passa, cima abre detalhes.`}
+      onDragStart={(e) => e.preventDefault()}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -92,12 +150,12 @@ function SwipeCard({ profile, leaving, disabled, onSwipe, onInfo }) {
       onKeyDown={onKeyDown}
     >
       <PhotoStack photos={profile.photos} index={photo} name={profile.username} fill />
-      <span className="stamp like" style={{ opacity: likeOpacity }} aria-hidden="true">Curtir</span>
-      <span className="stamp pass" style={{ opacity: passOpacity }} aria-hidden="true">Passar</span>
+      <span className="stamp like" style={{ opacity: 'var(--like-opacity, 0)' }} aria-hidden="true">Curtir</span>
+      <span className="stamp pass" style={{ opacity: 'var(--pass-opacity, 0)' }} aria-hidden="true">Passar</span>
 
       {profile.common_questions > 0 && (
         <span className="chip card-compat">
-          <Icon name="heart" size={16} filled /> {profile.compatibility}% compatível
+          <b>{profile.compatibility}<small>%</small></b><span>de afinidade</span>
         </span>
       )}
 
@@ -135,7 +193,7 @@ function EmptyDeck({ reason, message, onRefresh }) {
   const action = EMPTY_ACTIONS[reason]
   return (
     <div className="empty-state">
-      <span className="empty-ico"><Icon name="compass" size={36} /></span>
+      <EmptyIllustration />
       <h2>Nenhum perfil por enquanto</h2>
       <p>{message || 'Você viu todos os perfis desta rodada.'}</p>
       <div className="row empty-actions">
@@ -150,14 +208,19 @@ function EmptyDeck({ reason, message, onRefresh }) {
 
 function MatchDialog({ match, myPhoto, myName, onClose }) {
   return (
-    <Sheet title="É um match!" onClose={onClose} size="sm" hideTitle>
+    <Sheet title="Deu match!" onClose={onClose} size="match" hideTitle>
       <div className="match-hero">
+        <div className="match-confetti" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} style={{ '--i': i }} />)}</div>
+        <h2 className="match-title">Deu match!</h2>
         <div className="match-photos">
           <Avatar src={myPhoto} name={myName} size="lg" />
           <Avatar src={match.photos?.[0]} name={match.username} size="lg" className="second" />
           <span className="match-heart"><Icon name="heart" size={22} filled /></span>
         </div>
-        <h2 className="match-title">É um match!</h2>
+        {match.common_questions > 0 && <AffinityScore value={match.compatibility} />}
+        {topicAgreement(match.breakdown).filter(t => t.agreements > 0).length > 0 && (
+          <div className="match-topics"><span>Vocês concordam em</span><div>{topicAgreement(match.breakdown).filter(t => t.agreements > 0).slice(0, 3).map(t => <span className="tag" key={t.topic}>{t.topic}</span>)}</div></div>
+        )}
         <p>
           Você e <b>{match.username}</b> curtiram um ao outro
           {match.common_questions > 0 && `, com ${match.compatibility}% de compatibilidade`}.
@@ -183,6 +246,11 @@ export default function Discover() {
   const [myPhoto, setMyPhoto] = useState(null)
   const [announce, setAnnounce] = useState('')
   const busy = useRef(false)
+  const likeButton = useRef(null)
+  const closeMatch = () => {
+    setMatch(null)
+    requestAnimationFrame(() => (likeButton.current ?? document.getElementById('main'))?.focus())
+  }
 
   const fetchDeck = useCallback(
     () => api.recommendations()
@@ -215,7 +283,7 @@ export default function Discover() {
     try {
       const [res] = await Promise.all([
         api.swipe(current.id, dir),
-        wait(reducedMotion() ? 0 : FLY_MS),
+        wait(reducedMotion() ? 160 : FLY_MS),
       ])
       setDeck((d) => d.slice(1))
       if (res.matched) {
@@ -235,7 +303,7 @@ export default function Discover() {
   if (loading) {
     return (
       <div className="discover">
-        <h1 className="page-title">Descobrir</h1>
+        <header className="discover-heading"><h1 className="page-title">Descobrir</h1><p>Uma conexão começa com ideias em comum.</p></header>
         <div className="deck"><div className="skeleton swipe-skeleton" aria-busy="true" aria-label="Carregando perfis" /></div>
       </div>
     )
@@ -244,9 +312,14 @@ export default function Discover() {
   const current = deck[0]
   return (
     <div className="discover">
-      <h1 className="page-title">Descobrir</h1>
+      <header className="discover-heading"><h1 className="page-title">Descobrir</h1><p>Uma conexão começa com ideias em comum.</p></header>
       <p className="sr-only" role="status" aria-live="polite">{announce}</p>
-      {error && <p className="error" role="alert">{error}</p>}
+      {error && (
+        <div className="stack">
+          <p className="error" role="alert">{error}</p>
+          {!current && <button type="button" className="secondary" onClick={refresh}>Tentar novamente</button>}
+        </div>
+      )}
 
       {current ? (
         <>
@@ -266,11 +339,11 @@ export default function Discover() {
             />
           </div>
           <div className="deck-actions">
-            <button type="button" className="act pass" onClick={() => swipe('pass')} disabled={Boolean(leaving)} aria-label={`Passar ${current.username}`}>
-              <Icon name="x" size={30} />
+            <button type="button" className={`act pass${leaving === 'pass' ? ' chosen' : ''}`}  onClick={() => swipe('pass')} disabled={Boolean(leaving)} aria-label={`Passar ${current.username}`}>
+              <Icon name="x" size={30} /><span>Passar</span>
             </button>
-            <button type="button" className="act like" onClick={() => swipe('like')} disabled={Boolean(leaving)} aria-label={`Curtir ${current.username}`}>
-              <Icon name="heart" size={32} filled />
+            <button type="button" className={`act like${leaving === 'like' ? ' chosen' : ''}`}  ref={likeButton} onClick={() => swipe('like')} disabled={Boolean(leaving)} aria-label={`Curtir ${current.username}`}>
+              <Icon name="heart" size={32} filled /><span>Curtir</span>
             </button>
           </div>
         </>
@@ -285,7 +358,7 @@ export default function Discover() {
           onDone={() => { setInfo(false); setDeck((d) => d.slice(1)) }}
         />
       )}
-      {match && <MatchDialog match={match} myPhoto={myPhoto} myName={user.username} onClose={() => setMatch(null)} />}
+      {match && <MatchDialog match={match} myPhoto={myPhoto} myName={user.username} onClose={closeMatch} />}
     </div>
   )
 }
