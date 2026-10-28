@@ -14,3 +14,8 @@
 .safety-page h2 { margin-bottom: var(--s-3); }
 .safety-page p { line-height: 1.65; margin-bottom: var(--s-4); }
 .safety-page .row { flex-wrap: wrap; }
+.message-notice { position: fixed; z-index: calc(var(--z-nav) + 1); top: calc(var(--topbar-h) + var(--safe-top) + var(--s-3)); right: var(--s-4); left: var(--s-4); pointer-events: none; }
+.notice-content { display: flex; align-items: center; gap: var(--s-3); max-width: 32rem; margin-left: auto; padding: var(--s-3); background: var(--c-surface); color: var(--c-text); box-shadow: var(--shadow-3); border-radius: var(--r-md); pointer-events: auto; }
+.notice-content span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.unread-divider { text-align: center; color: var(--c-soft-text); background: var(--c-soft-bg); padding: var(--s-2); margin-block: var(--s-4); border-radius: var(--r-sm); font-size: .875rem; }
+@media (min-width: 1024px) { .message-notice { left: auto; top: var(--s-4); } }

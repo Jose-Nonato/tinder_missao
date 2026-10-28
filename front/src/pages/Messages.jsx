@@ -69,6 +69,8 @@ function Thread({ other }) {
   const [menu, setMenu] = useState(false)
   const [suggestions, setSuggestions] = useState([])
   const composer = useRef(null)
+  const follow = useRef(true)
+  const [firstUnread, setFirstUnread] = useState(null)
   const scroller = useRef(null)
   const bottom = useRef(null)
   const prevHeight = useRef(null) // preserva a posição ao carregar mensagens antigas
@@ -81,6 +83,7 @@ function Thread({ other }) {
     api.history(other.id)
       .then((h) => {
         if (cancelled) return
+        setFirstUnread(h.messages.find(m => m.sender_id === other.id && !m.read_at)?.id ?? null)
         setMessages(h.messages)
         setHasMore(h.has_more)
         api.markRead(other.id).catch(() => {})
@@ -95,6 +98,7 @@ function Thread({ other }) {
     if (ev.type === 'message') {
       const m = ev.message
       if (m.sender_id !== other.id && m.recipient_id !== other.id) return
+      if (m.sender_id === other.id) setFirstUnread(id => id ?? m.id)
       setMessages((list) => {
         if (list.some((x) => x.id === m.id)) return list
         // eco da minha própria mensagem otimista: troca a pendente pela definitiva
@@ -118,7 +122,7 @@ function Thread({ other }) {
     if (prevHeight.current != null) {
       el.scrollTop = el.scrollHeight - prevHeight.current
       prevHeight.current = null
-    } else {
+    } else if (follow.current) {
       bottom.current?.scrollIntoView({ block: 'end' })
     }
   }, [messages])
@@ -139,6 +143,7 @@ function Thread({ other }) {
     setError('')
     try {
       const clientId = chat.send(other.id, body)
+      follow.current = true
       setMessages((list) => [...list, {
         id: clientId, client_id: clientId, sender_id: me.id, recipient_id: other.id,
         text: body, created_at: new Date().toISOString(), read_at: null, pending: true,
@@ -177,7 +182,7 @@ function Thread({ other }) {
         </button>
       </header>
 
-      <div className="messages" ref={scroller}>
+      <div className="messages" ref={scroller} onScroll={e => { const el = e.currentTarget; follow.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80 }}>
         {loading && <p className="center muted">Carregando…</p>}
         {hasMore && <button type="button" className="secondary small center-btn" onClick={loadOlder}>Mensagens anteriores</button>}
         {!loading && messages.length === 0 && (
@@ -193,6 +198,7 @@ function Thread({ other }) {
           const newDay = i === 0 || day(messages[i - 1].created_at) !== day(m.created_at)
           return (
             <div key={m.id}>
+              {m.id === firstUnread && <div className="unread-divider" role="separator" aria-label="Novas mensagens">Novas mensagens</div>}
               {newDay && <div className="day">{sameDay(m.created_at) ? 'Hoje' : day(m.created_at)}</div>}
               <div className={`bubble${mine ? ' mine' : ''}`}>
                 <span className="bubble-text">{m.text}</span>

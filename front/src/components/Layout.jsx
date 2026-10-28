@@ -6,6 +6,7 @@ import { useChat } from '../chat/ChatContext'
 import Icon from './Icon'
 import Logo, { LogoMark } from './Logo'
 import Sheet from './Sheet'
+import MessageNotice from './MessageNotice'
 
 // Etapas obrigatórias para usuários comuns (admins ficam de fora):
 // 1) responder o questionário, 2) completar o perfil.
@@ -240,6 +241,7 @@ export function Layout() {
         </nav>
       )}
 
+      <MessageNotice />
       {moreOpen && (
         <MoreSheet user={user} items={nav.secondary} onClose={() => setMoreOpen(false)} onLogout={doLogout} />
       )}
