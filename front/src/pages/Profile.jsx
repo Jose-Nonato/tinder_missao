@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { api, assetUrl } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import Icon from '../components/Icon'
+import ProfileSheet from '../components/ProfileSheet'
 import { Input, Select, Textarea } from '../components/Field'
 
 const MAX_PHOTOS = 6
@@ -38,6 +39,8 @@ export default function Profile() {
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [preview, setPreview] = useState(null)
+  const [previewLoading, setPreviewLoading] = useState(false)
   const [photoError, setPhotoError] = useState('')
   const gallery = useRef(null)
   const positions = useRef(new Map())
@@ -89,6 +92,19 @@ export default function Profile() {
     updatePhotos(photos)
   }
 
+  const showPreview = async () => {
+    setPreviewLoading(true)
+    try {
+      const profile = await api.myProfile()
+      if (!profile) { setError('Salve seu perfil antes de abrir a prévia.'); return }
+      const birth = profile.birth_date && new Date(`${profile.birth_date}T00:00:00`)
+      const today = new Date()
+      const age = birth ? today.getFullYear() - birth.getFullYear() - Number(today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) : null
+      setPreview({ ...profile, username: user.username, age })
+    } catch (err) { setError(err.message) }
+    finally { setPreviewLoading(false) }
+  }
+
   const submit = async (e) => {
     e.preventDefault()
     if (saving || uploading) return
@@ -126,6 +142,8 @@ export default function Profile() {
   return (
     <form className="profile-form profile-editor" onSubmit={submit} aria-busy={saving}>
       <header className="profile-heading"><div><h1 className="page-title">Meu perfil</h1><p className="muted">Seu jeito de se apresentar. Seu jeito de se conectar.</p></div><span className="tag">{user.username}</span></header>
+      <div className="profile-preview-action"><button className="secondary" type="button" onClick={showPreview} disabled={previewLoading}>{previewLoading ? 'Carregando prévia…' : 'Como meu perfil aparece'}</button><small className="muted">A prévia mostra sua última versão salva.</small></div>
+      {preview && <ProfileSheet profile={preview} preview onClose={() => setPreview(null)} />}
       {required && <p className="notice" role="status">Quase lá! Complete seu perfil para começar a ver pessoas.</p>}
       <fieldset className="profile-fields" disabled={saving}>
         <legend className="sr-only">Editar meu perfil</legend>

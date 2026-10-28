@@ -7,3 +7,4 @@
 .profile-photo { transform-origin: top left; }
 .q-save { flex-wrap: wrap; }
 .q-save .grow { flex-basis: 100%; }
+.profile-preview-action { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); margin-bottom: var(--s-6); }
