@@ -41,6 +41,7 @@ const TITLES = {
   '/profile': 'Meu perfil',
   '/questionnaire': 'Questionário',
   '/blocked': 'Bloqueados',
+  '/safety': 'Central de segurança',
   '/admin/questions': 'Perguntas',
   '/admin/users': 'Usuários',
   '/admin/reports': 'Denúncias',
@@ -74,6 +75,7 @@ function buildNav(user, { unread, pendingResets }) {
     secondary: [
       { to: '/', label: 'Início', icon: 'home', end: true },
       { to: '/questionnaire', label: 'Questionário', icon: 'clipboard' },
+      { to: '/safety', label: 'Segurança', icon: 'shield' },
       { to: '/blocked', label: 'Bloqueados', icon: 'ban' },
     ],
   }

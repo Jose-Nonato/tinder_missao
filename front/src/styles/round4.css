@@ -8,3 +8,9 @@
 .q-save { flex-wrap: wrap; }
 .q-save .grow { flex-basis: 100%; }
 .profile-preview-action { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); margin-bottom: var(--s-6); }
+.safety-page { max-width: 68ch; }
+.safety-page .lead { font-size: 1.25rem; margin-bottom: var(--s-7); }
+.safety-page section { padding-block: var(--s-6); border-top: 1px solid var(--c-border); }
+.safety-page h2 { margin-bottom: var(--s-3); }
+.safety-page p { line-height: 1.65; margin-bottom: var(--s-4); }
+.safety-page .row { flex-wrap: wrap; }
