@@ -1,0 +1,21 @@
+/* Extensão da identidade existente: leitura confortável e consentimento destacado. */
+.terms-consent { display: grid; gap: var(--s-3); }
+label.terms-consent-label { align-items: flex-start; padding-block: var(--s-2); cursor: pointer; line-height: 1.6; }
+.terms-consent-label input { margin-top: var(--s-3); }
+.terms-consent-label a { display: inline-block; min-height: 44px; padding-block: var(--s-2); font-weight: 700; }
+.terms-description { padding: var(--s-4); background: var(--c-surface-2); border-radius: var(--r-sm); font-size: .875rem; line-height: 1.6; }
+.terms-description strong { display: block; margin-bottom: var(--s-1); }
+.legal-links { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--s-2) var(--s-4); font-size: .875rem; }
+.legal-links a, .legal-header > a, .legal-back { display: inline-flex; align-items: center; min-height: 44px; }
+.auth-card-wrap > .legal-links { padding-block: var(--s-3); border-top: 1px solid var(--c-border); }
+.legal-page { max-width: 880px; margin-inline: auto; padding: var(--s-6) var(--s-5) var(--s-8); }
+.legal-header { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); padding-bottom: var(--s-6); border-bottom: 1px solid var(--c-border); }
+.legal-document { max-width: 70ch; margin-inline: auto; }
+.legal-document h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-block: var(--s-7) var(--s-6); }
+.legal-draft { display: grid; gap: var(--s-2); margin-bottom: var(--s-4); }
+.legal-index { display: flex; flex-direction: column; align-items: flex-start; margin-block: var(--s-6); padding-block: var(--s-3); border-block: 1px solid var(--c-border); }
+.legal-index a { display: flex; align-items: center; min-height: 44px; padding-block: var(--s-2); }
+.legal-document section { margin-block: var(--s-7); scroll-margin-top: var(--s-6); }
+.legal-document h2 { margin-bottom: var(--s-3); }
+.legal-document section p { line-height: 1.75; }
+.legal-page footer { margin-top: var(--s-8); padding-top: var(--s-5); border-top: 1px solid var(--c-border); text-align: center; }

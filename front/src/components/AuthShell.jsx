@@ -1,4 +1,5 @@
 import Logo from './Logo'
+import LegalLinks from './LegalLinks'
 
 // Moldura das telas de entrada (login, cadastro, recuperação): fundo da marca + cartão.
 export default function AuthShell({ children }) {
@@ -8,7 +9,7 @@ export default function AuthShell({ children }) {
         <Logo size={44} />
         <p className="auth-tagline">Conexões que começam pelo que você <em>pensa.</em></p>
       </div>
-      <div className="auth-card-wrap">{children}</div>
+      <div className="auth-card-wrap">{children}<LegalLinks /></div>
     </main>
   )
 }

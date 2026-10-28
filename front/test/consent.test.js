@@ -1,0 +1,18 @@
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { registrationPayload, TERMS_VERSION } from '../src/legal/consent.js'
+
+test('registration requires explicit consent and sends the published version', () => {
+  const form = { username: 'test', email: 'test@example.test', password: 'test-only' }
+  for (const value of [false, undefined, null, 'true', 1]) {
+    assert.throws(() => registrationPayload(form, value), /aceitar/)
+  }
+  assert.deepEqual(registrationPayload(form, true), { ...form, accept_terms: true, terms_version: TERMS_VERSION })
+  assert.equal(form.accept_terms, undefined)
+})
+
+test('front and API publish the same legal document version', () => {
+  const backend = readFileSync(new URL('../../back/app/core/terms.py', import.meta.url), 'utf8')
+  assert.ok(backend.includes(`TERMS_VERSION = "${TERMS_VERSION}"`))
+})

@@ -4,11 +4,14 @@ import { api } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import AuthShell from '../components/AuthShell'
 import PasswordInput from '../components/PasswordInput'
+import TermsConsent from '../components/TermsConsent'
+import { registrationPayload } from '../legal/consent'
 
 export default function Register() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState({ username: '', email: '', password: '' })
+  const [accepted, setAccepted] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -19,7 +22,7 @@ export default function Register() {
     setError('')
     setBusy(true)
     try {
-      await api.register(form)
+      await api.register(registrationPayload(form, accepted))
       await login(form.email, form.password)
       navigate('/')
     } catch (err) {
@@ -66,6 +69,7 @@ export default function Register() {
           maxLength={128}
           required
         />
+        <TermsConsent checked={accepted} onChange={setAccepted} />
         {error && <p className="error" role="alert">{error}</p>}
         <button className="big" disabled={busy}>{busy ? 'Criando…' : 'Cadastrar'}</button>
         <p className="auth-links">Já tem conta? <Link to="/login">Entrar</Link></p>
