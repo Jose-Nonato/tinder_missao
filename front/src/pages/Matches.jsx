@@ -40,7 +40,7 @@ export default function Matches() {
           <ul className="match-grid">
             {matches.map(({ profile, matched_at }) => (
               <li key={profile.id} className="match-tile">
-                <Link to={`/messages/${profile.id}`} className="match-link" aria-label={`Conversar com ${profile.username}`}>
+                <Link to={`/messages/${profile.id}`} className="match-link">
                   {profile.photos?.[0] ? (
                     <img src={assetUrl(profile.photos[0])} alt="" loading="lazy" draggable={false} />
                   ) : (
