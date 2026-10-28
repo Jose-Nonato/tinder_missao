@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, assetUrl } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
@@ -15,6 +15,9 @@ export default function Questionnaire() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
+  const questionRef = useRef(null)
+  const [step, setStep] = useState(0)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     Promise.all([api.activeQuestions(), api.myAnswers()])
@@ -26,6 +29,8 @@ export default function Questionnaire() {
       .finally(() => setLoading(false))
   }, [])
 
+  useEffect(() => { questionRef.current?.focus({ preventScroll: true }) }, [step])
+
   const pick = (code, optionId) => {
     setSaved(false)
     setChosen({ ...chosen, [code]: optionId })
@@ -33,6 +38,7 @@ export default function Questionnaire() {
 
   const save = async () => {
     setError('')
+    setSaving(true)
     try {
       // só envia respostas de perguntas ainda ativas
       const answers = questions
@@ -44,17 +50,19 @@ export default function Questionnaire() {
       else setSaved(true)
     } catch (err) {
       setError(err.message)
+    } finally {
+      setSaving(false)
     }
   }
 
-  if (loading) return <p className="center loading">Carregando…</p>
+  if (loading) return <div className="skeleton question-skeleton" aria-label="Carregando perguntas" aria-busy="true" />
   const answered = questions.filter((q) => chosen[q.code]).length
 
   return (
     <>
       <h1 className="page-title">Questionário</h1>
       {required && (
-        <p className="notice">Antes de continuar, responda todas as perguntas abaixo.</p>
+        <p className="notice">Antes de continuar, responda todas as perguntas. Suas escolhas só são enviadas ao salvar.</p>
       )}
       {questions.length === 0 && <p>Nenhuma pergunta disponível no momento.</p>}
       {questions.length > 0 && (
@@ -68,10 +76,10 @@ export default function Questionnaire() {
           </div>
         </div>
       )}
-      {questions.map((q) => (
+      {questions.slice(step, step + 1).map((q) => (
         <section className="card q-card" key={q.code}>
-          <h2 className="q-question">{q.text}</h2>
-          <span className="tag">{q.topic}</span>
+          <div className="q-step-meta"><span className="tag">{q.topic}</span><span>{step + 1} / {questions.length}</span></div>
+          <h2 className="q-question" ref={questionRef} tabIndex={-1}>{q.text}</h2>
           {q.image && <img className="qimg" src={assetUrl(q.image.url)} alt={q.image.altText} />}
           <div className="options" role="radiogroup" aria-label={q.text}>
             {q.options.map((o) => (
@@ -100,17 +108,22 @@ export default function Questionnaire() {
           </div>
         </section>
       ))}
+      {questions.length > 0 && <div className="q-navigation">
+        <button className="secondary" disabled={step === 0} onClick={() => setStep(step - 1)}>Anterior</button>
+        <span className="muted" aria-live="polite">Pergunta {step + 1} de {questions.length}</span>
+        <button disabled={step === questions.length - 1} onClick={() => setStep(step + 1)}>Próxima</button>
+      </div>}
       {error && <p className="error" role="alert">{error}</p>}
       {questions.length > 0 && (
-        <div className="sticky-actions">
+        <div className="sticky-actions q-save">
           <span className="grow">
             {required && answered < questions.length
               ? `Faltam ${questions.length - answered} para continuar`
               : 'Pronto para salvar'}
           </span>
           {saved && <span className="ok" role="status">Salvo!</span>}
-          <button className="big" onClick={save} disabled={required ? answered < questions.length : answered === 0}>
-            Salvar respostas
+          <button className="big" onClick={save} disabled={saving || (required ? answered < questions.length : answered === 0)}>
+            {saving ? 'Salvando…' : 'Salvar respostas'}
           </button>
         </div>
       )}

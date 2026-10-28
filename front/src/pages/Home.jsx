@@ -7,7 +7,7 @@ export default function Home() {
   const isUser = user.role === 'user'
   return (
     <>
-      <section className="hero">
+      <section className="hero"><span className="hero-symbol" aria-hidden="true"><Icon name="heart" size={160} /></span>
         <h1 className="hero-title">Olá, {user.username}!</h1>
         <p className="hero-text">
           {isUser

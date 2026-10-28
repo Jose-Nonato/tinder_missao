@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
 import Avatar from '../components/Avatar'
-import Icon from '../components/Icon'
+import EmptyIllustration from '../components/EmptyIllustration'
 
 export default function Blocked() {
   const [users, setUsers] = useState([])
@@ -37,7 +37,7 @@ export default function Blocked() {
       {error && <p className="error" role="alert">{error}</p>}
       {users.length === 0 && !error && (
         <div className="empty-state">
-          <span className="empty-ico"><Icon name="shield" size={36} /></span>
+          <EmptyIllustration />
           <h2>Você não bloqueou ninguém</h2>
           <p>Para bloquear alguém, abra o perfil da pessoa em Descobrir, Matches ou na conversa.</p>
           <Link to="/discover" className="cta">Voltar a descobrir</Link>

@@ -7,6 +7,9 @@ import Icon from '../components/Icon'
 import { PhotoStack } from '../components/PhotoGallery'
 import ProfileSheet from '../components/ProfileSheet'
 import Sheet from '../components/Sheet'
+import AffinityScore from '../components/AffinityScore'
+import EmptyIllustration from '../components/EmptyIllustration'
+import { topicAgreement } from '../components/topicAgreement'
 
 const SWIPE_DISTANCE = 110 // px arrastados para valer como curtir/passar
 const FLY_MS = 240
@@ -98,7 +101,7 @@ function SwipeCard({ profile, leaving, disabled, onSwipe, onInfo }) {
 
       {profile.common_questions > 0 && (
         <span className="chip card-compat">
-          <Icon name="heart" size={16} filled /> {profile.compatibility}% compatível
+          <b>{profile.compatibility}<small>%</small></b><span>afinidade<br />política</span>
         </span>
       )}
 
@@ -136,7 +139,7 @@ function EmptyDeck({ reason, message, onRefresh }) {
   const action = EMPTY_ACTIONS[reason]
   return (
     <div className="empty-state">
-      <span className="empty-ico"><Icon name="compass" size={36} /></span>
+      <EmptyIllustration />
       <h2>Nenhum perfil por enquanto</h2>
       <p>{message || 'Você viu todos os perfis desta rodada.'}</p>
       <div className="row empty-actions">
@@ -151,14 +154,19 @@ function EmptyDeck({ reason, message, onRefresh }) {
 
 function MatchDialog({ match, myPhoto, myName, onClose }) {
   return (
-    <Sheet title="É um match!" onClose={onClose} size="sm" hideTitle>
+    <Sheet title="Deu match!" onClose={onClose} size="match" hideTitle>
       <div className="match-hero">
+        <div className="match-confetti" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} style={{ '--i': i }} />)}</div>
+        <h2 className="match-title">Deu match!</h2>
         <div className="match-photos">
           <Avatar src={myPhoto} name={myName} size="lg" />
           <Avatar src={match.photos?.[0]} name={match.username} size="lg" className="second" />
           <span className="match-heart"><Icon name="heart" size={22} filled /></span>
         </div>
-        <h2 className="match-title">É um match!</h2>
+        {match.common_questions > 0 && <AffinityScore value={match.compatibility} />}
+        {topicAgreement(match.breakdown).filter(t => t.agreements > 0).length > 0 && (
+          <div className="match-topics"><span>Vocês concordam em</span><div>{topicAgreement(match.breakdown).filter(t => t.agreements > 0).slice(0, 3).map(t => <span className="tag" key={t.topic}>{t.topic}</span>)}</div></div>
+        )}
         <p>
           Você e <b>{match.username}</b> curtiram um ao outro
           {match.common_questions > 0 && `, com ${match.compatibility}% de compatibilidade`}.
@@ -184,6 +192,11 @@ export default function Discover() {
   const [myPhoto, setMyPhoto] = useState(null)
   const [announce, setAnnounce] = useState('')
   const busy = useRef(false)
+  const likeButton = useRef(null)
+  const closeMatch = () => {
+    setMatch(null)
+    requestAnimationFrame(() => (likeButton.current ?? document.getElementById('main'))?.focus())
+  }
 
   const fetchDeck = useCallback(
     () => api.recommendations()
@@ -236,7 +249,7 @@ export default function Discover() {
   if (loading) {
     return (
       <div className="discover">
-        <h1 className="page-title">Descobrir</h1>
+        <header className="discover-heading"><h1 className="page-title">Descobrir</h1><p>Uma conexão começa com ideias em comum.</p></header>
         <div className="deck"><div className="skeleton swipe-skeleton" aria-busy="true" aria-label="Carregando perfis" /></div>
       </div>
     )
@@ -245,7 +258,7 @@ export default function Discover() {
   const current = deck[0]
   return (
     <div className="discover">
-      <h1 className="page-title">Descobrir</h1>
+      <header className="discover-heading"><h1 className="page-title">Descobrir</h1><p>Uma conexão começa com ideias em comum.</p></header>
       <p className="sr-only" role="status" aria-live="polite">{announce}</p>
       {error && (
         <div className="stack">
@@ -273,10 +286,10 @@ export default function Discover() {
           </div>
           <div className="deck-actions">
             <button type="button" className="act pass" onClick={() => swipe('pass')} disabled={Boolean(leaving)} aria-label={`Passar ${current.username}`}>
-              <Icon name="x" size={30} />
+              <Icon name="x" size={30} /><span>Passar</span>
             </button>
-            <button type="button" className="act like" onClick={() => swipe('like')} disabled={Boolean(leaving)} aria-label={`Curtir ${current.username}`}>
-              <Icon name="heart" size={32} filled />
+            <button type="button" className="act like" ref={likeButton} onClick={() => swipe('like')} disabled={Boolean(leaving)} aria-label={`Curtir ${current.username}`}>
+              <Icon name="heart" size={32} filled /><span>Curtir</span>
             </button>
           </div>
         </>
@@ -291,7 +304,7 @@ export default function Discover() {
           onDone={() => { setInfo(false); setDeck((d) => d.slice(1)) }}
         />
       )}
-      {match && <MatchDialog match={match} myPhoto={myPhoto} myName={user.username} onClose={() => setMatch(null)} />}
+      {match && <MatchDialog match={match} myPhoto={myPhoto} myName={user.username} onClose={closeMatch} />}
     </div>
   )
 }

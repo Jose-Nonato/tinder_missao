@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { WEIGHTS } from '../constants'
 import Icon from './Icon'
+import AffinityScore from './AffinityScore'
+import { topicAgreement } from './topicAgreement'
 
 // Explica de onde vem a porcentagem: quais perguntas entraram, se concordam ou divergem e
 // quanto cada uma pesa. Mostra só "concordam/divergem", nunca a resposta da outra pessoa.
@@ -28,6 +30,11 @@ export default function CompatibilityDetails({ profile, alwaysOpen = false }) {
       )}
       {expanded && (
         <div className="compat-details">
+          <div className="compat-summary"><AffinityScore value={profile.compatibility} /><div><h3>Afinidade por tópico</h3><p className="muted">Concordâncias entre as perguntas comparadas, sem ponderação. O percentual geral considera os pesos.</p></div></div>
+          <div className="topic-bars">{topicAgreement(profile.breakdown).map(t => <div key={t.topic}>
+            <div className="row between"><b>{t.topic}</b><small>{t.agreements} de {t.total} em acordo</small></div>
+            <div className="meter" role="img" aria-label={`${t.topic}: ${t.agreements} concordâncias e ${t.total - t.agreements} divergências`}><div style={{ width: `${t.percent}%` }} /></div>
+          </div>)}</div>
           <p className="muted">
             As perguntas mais importantes pesam mais no resultado. Perguntas em que um dos dois não tem
             opinião ficam de fora.
