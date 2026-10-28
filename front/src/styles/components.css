@@ -29,6 +29,8 @@
   letter-spacing: -0.02em;
 }
 .logo-mark {
+  display: block;
+  color: var(--c-on-brand);
   flex: none;
 }
 
