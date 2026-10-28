@@ -6,7 +6,7 @@ import { registrationPayload, TERMS_VERSION } from '../src/legal/consent.js'
 test('registration requires explicit consent and sends the published version', () => {
   const form = { username: 'test', email: 'test@example.test', password: 'test-only' }
   for (const value of [false, undefined, null, 'true', 1]) {
-    assert.throws(() => registrationPayload(form, value), /aceitar/)
+    assert.throws(() => registrationPayload(form, value), { message: 'Para criar sua conta, você precisa aceitar os termos e consentir com o uso dos dados conforme a declaração de consentimento.' })
   }
   assert.deepEqual(registrationPayload(form, true), { ...form, accept_terms: true, terms_version: TERMS_VERSION })
   assert.equal(form.accept_terms, undefined)
