@@ -1,0 +1,53 @@
+# ---------- segredos e configuração local ----------
+# O .env tem a chave do JWT e a senha do admin. Só o modelo (.env.example) vai para o git.
+.env
+.env.*
+!.env.example
+
+# ---------- Python (back/) ----------
+.ven/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# fotos enviadas pelos usuários (ficam no disco local)
+back/uploads/
+
+# ---------- Node (front/) ----------
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.vite/
+
+# ---------- logs e temporários ----------
+logs/
+*.log
+*.tmp
+*.swp
+
+# ---------- editores e sistema ----------
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.DS_Store
+Thumbs.db
+
+# ---------- Claude Code ----------
+# configurações pessoais da máquina (as skills em .claude/skills continuam versionadas)
+.claude/settings.local.json

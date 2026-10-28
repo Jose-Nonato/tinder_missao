@@ -1,0 +1,23 @@
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env")
+
+    mongodb_url: str = "mongodb://localhost:27017"
+    mongodb_db: str = "tinder_missao"
+    jwt_secret_key: str
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 7
+    # Validade do link de redefinição de senha gerado pelo admin
+    reset_token_minutes: int = 60
+    upload_dir: str = "uploads"
+    max_upload_mb: int = 5
+    # Admin inicial, criado no startup se os três estiverem definidos
+    admin_username: str | None = None
+    admin_email: str | None = None
+    admin_password: str | None = None
+
+
+settings = Settings()

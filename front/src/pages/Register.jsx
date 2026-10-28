@@ -1,0 +1,75 @@
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { api } from '../api/client'
+import { useAuth } from '../auth/AuthContext'
+import AuthShell from '../components/AuthShell'
+import PasswordInput from '../components/PasswordInput'
+
+export default function Register() {
+  const { login } = useAuth()
+  const navigate = useNavigate()
+  const [form, setForm] = useState({ username: '', email: '', password: '' })
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
+
+  const submit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setBusy(true)
+    try {
+      await api.register(form)
+      await login(form.email, form.password)
+      navigate('/')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <AuthShell>
+      <form className="card auth" onSubmit={submit}>
+        <h1>Criar conta</h1>
+        <label>Usuário
+          <input
+            value={form.username}
+            onChange={set('username')}
+            autoComplete="username"
+            minLength={3}
+            maxLength={30}
+            pattern="[A-Za-z0-9_.\-]+"
+            title="Letras, números, ponto, hífen e sublinhado"
+            required
+          />
+        </label>
+        <label>Email
+          <input
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            value={form.email}
+            onChange={set('email')}
+            maxLength={254}
+            required
+          />
+        </label>
+        <PasswordInput
+          label="Senha"
+          hint="Mínimo de 8 caracteres."
+          autoComplete="new-password"
+          value={form.password}
+          onChange={set('password')}
+          minLength={8}
+          maxLength={128}
+          required
+        />
+        {error && <p className="error" role="alert">{error}</p>}
+        <button className="big" disabled={busy}>{busy ? 'Criando…' : 'Cadastrar'}</button>
+        <p className="auth-links">Já tem conta? <Link to="/login">Entrar</Link></p>
+      </form>
+    </AuthShell>
+  )
+}

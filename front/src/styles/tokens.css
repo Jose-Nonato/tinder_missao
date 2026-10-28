@@ -1,0 +1,124 @@
+/*
+ * Tokens de design — identidade inspirada no Tinder, com as cores do Partido Missão
+ * (amarelo, preto e branco). O amarelo é sempre usado como FUNDO: o texto sobre ele é a
+ * tinta escura (--c-on-brand). Nenhum componente usa hex direto: tudo vem destas variáveis.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* marca */
+  --c-brand: #ffcc00;
+  --c-brand-light: #ffe45c;
+  --c-brand-deep: #ffa800;
+  --c-on-brand: #121212;
+  --gradient-brand: linear-gradient(135deg, var(--c-brand-light) 0%, var(--c-brand) 48%, var(--c-brand-deep) 100%);
+
+  /* superfícies e texto (claro) */
+  --c-bg: #f6f5f0;
+  --c-surface: #ffffff;
+  --c-surface-2: #efede6;
+  --c-border: #e1ded3;
+  --c-border-strong: #8a877b; /* bordas de campos: 3:1 contra a superfície */
+  --c-text: #121212;
+  --c-text-muted: #57554d;
+  --c-link: #121212;
+  --c-focus: #121212;
+  --c-scrim: rgba(10, 10, 10, 0.62);
+
+  /* realce suave de marca (aba ativa, avisos, tags) */
+  --c-soft-bg: #fff1b8;
+  --c-soft-text: #3d2f00;
+
+  /* estados */
+  --c-success: #0f7a47;
+  --c-success-bg: #e3f5eb;
+  --c-danger: #c4262e;
+  --c-danger-bg: #fdecec;
+  --c-on-danger: #ffffff; /* texto de botão de perigo (no escuro o vermelho é claro: texto escuro) */
+
+  /* texto sobre fundo branco translúcido em cima de fotos (iguais nos dois temas) */
+  --c-on-photo-success: #0b6b3d;
+  --c-on-photo-danger: #b3202a;
+
+  /* escala de espaçamento (4/8) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-7: 32px;
+  --s-8: 48px;
+
+  /* raios */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* elevação */
+  --shadow-1: 0 1px 2px rgba(18, 18, 18, 0.06), 0 1px 3px rgba(18, 18, 18, 0.08);
+  --shadow-2: 0 4px 14px rgba(18, 18, 18, 0.12);
+  --shadow-3: 0 16px 40px rgba(18, 18, 18, 0.22);
+
+  /* movimento */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 320ms;
+
+  /* tipografia */
+  --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Consolas, monospace;
+
+  /* medidas do app */
+  --topbar-h: 56px;
+  --tabbar-h: 64px;
+  --sidebar-w: 264px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* camadas */
+  --z-nav: 20;
+  --z-skip: 2000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* modo escuro projetado à parte (tons mais claros/dessaturados, contraste conferido) */
+    --c-bg: #0b0b0c;
+    --c-surface: #17171a;
+    --c-surface-2: #222226;
+    --c-border: #34343a;
+    --c-border-strong: #74747d;
+    --c-text: #f4f4f2;
+    --c-text-muted: #a9a8a0;
+    --c-link: #ffcc00;
+    --c-focus: #ffcc00;
+    --c-scrim: rgba(0, 0, 0, 0.72);
+
+    --c-soft-bg: #3a3000;
+    --c-soft-text: #ffe45c;
+
+    --c-success: #4fd68f;
+    --c-success-bg: #12301f;
+    --c-danger: #ff7b80;
+    --c-danger-bg: #3a1618;
+    --c-on-danger: #1a0a0b;
+
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-2: 0 4px 14px rgba(0, 0, 0, 0.55);
+    --shadow-3: 0 16px 40px rgba(0, 0, 0, 0.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0.01ms;
+    --dur: 0.01ms;
+    --dur-slow: 0.01ms;
+  }
+}
