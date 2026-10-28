@@ -11,7 +11,7 @@ from app.controllers.auth_controller import register
 from app.core.config import settings
 from app.schemas.auth import RegisterRequest, UserResponse
 
-VERSION = "2026-10-28-draft-2"
+VERSION = "2026-10-28-draft-3"
 BASE = dict(username="consent_test", email="consent@example.test", password="Test-only-123!")
 
 
@@ -20,7 +20,8 @@ class ConsentValidationTest(unittest.TestCase):
         for fields in ({}, {"accept_terms": False, "terms_version": VERSION},
                        {"accept_terms": "true", "terms_version": VERSION},
                        {"accept_terms": 1, "terms_version": VERSION},
-                       {"accept_terms": True}, {"accept_terms": True, "terms_version": "old"}):
+                       {"accept_terms": True}, {"accept_terms": True, "terms_version": "old"},
+                       {"accept_terms": True, "terms_version": "2026-10-28-draft-2"}):
             with self.subTest(fields=fields), self.assertRaises(ValidationError):
                 RegisterRequest(**BASE, **fields)
 
