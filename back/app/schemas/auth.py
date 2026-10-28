@@ -1,6 +1,8 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictBool, field_validator
+
+from app.core.terms import TERMS_VERSION
 
 from app.core.roles import Role
 
@@ -9,6 +11,22 @@ class RegisterRequest(BaseModel):
     username: str = Field(min_length=3, max_length=30, pattern=r"^[A-Za-z0-9_.-]+$")
     email: str = Field(max_length=254, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
     password: str = Field(min_length=8, max_length=128)
+    accept_terms: StrictBool
+    terms_version: str = Field(max_length=64)
+
+    @field_validator("accept_terms")
+    @classmethod
+    def require_acceptance(cls, value):
+        if value is not True:
+            raise ValueError("É necessário aceitar os Termos de Uso e a Política de Privacidade.")
+        return value
+
+    @field_validator("terms_version")
+    @classmethod
+    def require_current_version(cls, value):
+        if value != TERMS_VERSION:
+            raise ValueError("Versão dos termos desatualizada. Recarregue a página e leia os documentos atuais.")
+        return value
 
 
 class LoginRequest(BaseModel):
@@ -44,6 +62,8 @@ class UserResponse(BaseModel):
     profile_completed: bool = False
     suspended: bool = False
     created_at: datetime
+    terms_accepted_at: datetime | None = None
+    terms_version: str | None = None
 
     @classmethod
     def from_doc(cls, doc: dict, questionnaire_completed: bool | None = None) -> "UserResponse":
@@ -60,6 +80,8 @@ class UserResponse(BaseModel):
             ),
             suspended=bool(doc.get("suspended", False)),
             created_at=doc["created_at"],
+            terms_accepted_at=doc.get("terms_accepted_at"),
+            terms_version=doc.get("terms_version"),
         )
 
 

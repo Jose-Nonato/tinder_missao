@@ -53,6 +53,8 @@ class SeedTest(unittest.IsolatedAsyncioTestCase):
         async for u in self.db.users.find():
             ProfileData.model_validate(u["profile"])
             self.assertNotEqual(u["role"], "admin")
+            self.assertEqual(u["terms_version"], seed.TERMS_VERSION)
+            self.assertIsNotNone(u["terms_accepted_at"])
             self.assertTrue(all((seed.UPLOAD_DIR / p.removeprefix("/uploads/")).is_file() for p in u["profile"]["photos"]))
             if u["email"] == "questionario@exemplo.test":
                 self.assertFalse(u["questionnaire_completed"])

@@ -13,6 +13,7 @@ from pathlib import Path
 from app.core.config import settings
 from app.core.database import client, get_db, init_indexes
 from app.core.security import hash_password
+from app.core.terms import TERMS_VERSION
 from app.schemas.profile import ProfileData
 from app.schemas.question import QuestionCreate
 
@@ -148,7 +149,9 @@ async def populate(db):
             {"email": email_for(person), "seed": SEED, "role": "user"},
             {"$set": {"username": username, "password_hash": password_hash, "profile": profile,
                       "profile_completed": True, "questionnaire_completed": not incomplete,
-                      "answers": [] if incomplete else answers, "suspended": False},
+                      "answers": [] if incomplete else answers, "suspended": False,
+                      # Aceite simulado, restrito às contas fictícias marcadas pelo seed.
+                      "terms_accepted_at": now, "terms_version": TERMS_VERSION},
              "$setOnInsert": {"created_at": now}}, upsert=True,
         )
         users.append(await db.users.find_one({"email": email_for(person)}))
