@@ -155,6 +155,11 @@ export function Layout() {
       return
     }
     mainRef.current?.focus({ preventScroll: true })
+    const animation = mainRef.current?.animate(
+      [{ opacity: 0.45 }, { opacity: 1 }],
+      { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180 },
+    )
+    return () => animation?.cancel()
   }, [focusKey])
 
   // "Mais" fica ativo quando a página atual é uma das rotas que moram nele

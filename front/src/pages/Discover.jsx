@@ -79,7 +79,8 @@ function SwipeCard({ profile, leaving, disabled, onSwipe, onInfo }) {
 
   return (
     <div
-      className={`swipe-card${drag ? ' dragging' : ''}`}
+      className={`swipe-card${drag ? ' dragging' : ''}${leaving ? ' leaving' : ''}`}
+      aria-busy={disabled}
       style={{ transform: `translate3d(${x}px, ${y}px, 0) rotate(${x / 18}deg)` }}
       tabIndex={0}
       role="group"
@@ -246,7 +247,12 @@ export default function Discover() {
     <div className="discover">
       <h1 className="page-title">Descobrir</h1>
       <p className="sr-only" role="status" aria-live="polite">{announce}</p>
-      {error && <p className="error" role="alert">{error}</p>}
+      {error && (
+        <div className="stack">
+          <p className="error" role="alert">{error}</p>
+          {!current && <button type="button" className="secondary" onClick={refresh}>Tentar novamente</button>}
+        </div>
+      )}
 
       {current ? (
         <>

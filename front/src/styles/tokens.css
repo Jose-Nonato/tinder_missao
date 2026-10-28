@@ -40,6 +40,18 @@
   --c-on-photo-success: #0b6b3d;
   --c-on-photo-danger: #b3202a;
 
+  /* fotos: constantes nos dois temas para garantir contraste sobre imagens */
+  --c-photo-text: #ffffff;
+  --c-photo-ink: #121212;
+  --c-photo-soft: rgba(255, 255, 255, 0.94);
+  --c-photo-track: rgba(255, 255, 255, 0.45);
+  --c-photo-shade: rgba(10, 10, 10, 0.72);
+  --c-photo-shade-hover: rgba(10, 10, 10, 0.88);
+  --c-photo-ring: rgba(0, 0, 0, 0.18);
+  --c-avatar-tint: rgba(18, 18, 18, 0.12);
+  --gradient-photo: linear-gradient(to top, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0.55) 55%, transparent);
+  --gradient-tile: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent 65%);
+
   /* escala de espaçamento (4/8) */
   --s-1: 4px;
   --s-2: 8px;
@@ -53,8 +65,8 @@
   /* raios */
   --r-sm: 10px;
   --r-md: 14px;
-  --r-lg: 20px;
-  --r-xl: 28px;
+  --r-lg: 16px;
+  --r-xl: 24px;
   --r-pill: 999px;
 
   /* elevação */
@@ -96,12 +108,12 @@
     --c-border-strong: #74747d;
     --c-text: #f4f4f2;
     --c-text-muted: #a9a8a0;
-    --c-link: #ffcc00;
+    --c-link: #f4f4f2;
     --c-focus: #ffcc00;
     --c-scrim: rgba(0, 0, 0, 0.72);
 
     --c-soft-bg: #3a3000;
-    --c-soft-text: #ffe45c;
+    --c-soft-text: #fff1b8;
 
     --c-success: #4fd68f;
     --c-success-bg: #12301f;

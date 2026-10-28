@@ -96,7 +96,7 @@ export default function Profile() {
 
   return (
     <>
-    <form onSubmit={submit}>
+    <form className="profile-form" onSubmit={submit}>
       <h1 className="page-title">Meu perfil</h1>
       {required && <p className="notice" role="status">Quase lá! Complete seu perfil para começar a ver pessoas.</p>}
 

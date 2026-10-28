@@ -69,9 +69,9 @@ export default function Questionnaire() {
         </div>
       )}
       {questions.map((q) => (
-        <section className="card" key={q.code}>
-          <span className="tag">{q.topic}</span>
+        <section className="card q-card" key={q.code}>
           <h2 className="q-question">{q.text}</h2>
+          <span className="tag">{q.topic}</span>
           {q.image && <img className="qimg" src={assetUrl(q.image.url)} alt={q.image.altText} />}
           <div className="options" role="radiogroup" aria-label={q.text}>
             {q.options.map((o) => (

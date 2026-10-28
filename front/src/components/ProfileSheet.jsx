@@ -31,6 +31,8 @@ export default function ProfileSheet({ profile, onClose, onDone }) {
               <div style={{ width: `${profile.compatibility}%` }} />
             </div>
           )}
+        </div>
+        <div className="ps-details stack">
           <CompatibilityDetails profile={profile} alwaysOpen />
           <UserActions profile={profile} onDone={(id, res) => onDone?.(id, res)} />
         </div>

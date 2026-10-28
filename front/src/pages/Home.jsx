@@ -8,7 +8,6 @@ export default function Home() {
   return (
     <>
       <section className="hero">
-        <p className="hero-kicker">Bem-vindo(a) de volta</p>
         <h1 className="hero-title">Olá, {user.username}!</h1>
         <p className="hero-text">
           {isUser
