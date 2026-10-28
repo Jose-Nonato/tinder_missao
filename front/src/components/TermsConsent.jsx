@@ -17,7 +17,7 @@ export default function TermsConsent({ checked, onChange }) {
     <p id={`${id}-description`} className="terms-description">
       <strong>Consentimento para dados sensíveis.</strong> Ao marcar, consinto explicitamente com o tratamento das minhas opiniões políticas e respostas ao questionário para calcular afinidade e recomendar pessoas. Este uso é necessário para o serviço de afinidade política. Meus dados não serão usados para comunicação política, propaganda ou marketing. O projeto é independente de partidos. Posso solicitar revogação ou exclusão da conta por e-mail a duckstech@hotmail.com, pois não há essa função no app.
     </p>
-    <small className="muted">Obrigatório. Os documentos abrem em nova aba e continuam em rascunho: a seção de doações está pendente e a revisão jurídica é recomendada.</small>
+    <small className="muted">Obrigatório. Os documentos abrem em nova aba.</small>
     {invalid && <p id={`${id}-error`} className="error" role="alert">{CONSENT_ERROR}</p>}
   </div>
 }
