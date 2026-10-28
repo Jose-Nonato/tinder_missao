@@ -1,3 +1,5 @@
+import Select from '../../components/form/Select'
+import { TextInput, Switch, FileUpload } from '../../components/form/Controls'
 import { useEffect, useState } from 'react'
 import { api, assetUrl } from '../../api/client'
 import Icon from '../../components/Icon'
@@ -74,40 +76,32 @@ function QuestionForm({ initial, editing, onSave, onCancel }) {
     <form className="card" onSubmit={submit}>
       <h2>{editing ? 'Editar pergunta' : 'Nova pergunta'}</h2>
       <div className="row">
-        <label>Tópico<input value={f.topic} onChange={set('topic')} required /></label>
-        <label>Importância na compatibilidade
-          <select value={f.weight} onChange={set('weight')}>
+        <label>Tópico<TextInput value={f.topic} onChange={set('topic')} required /></label>
+        <Select label="Importância na compatibilidade" value={f.weight} onChange={set('weight')}>
             {Object.entries(WEIGHTS).map(([value, label]) => (
               <option key={value} value={value}>{value} · {label}</option>
             ))}
-          </select>
-        </label>
+          </Select>
       </div>
-      <label>Pergunta<input value={f.text} onChange={set('text')} required /></label>
+      <label>Pergunta<TextInput value={f.text} onChange={set('text')} required /></label>
       <div className="row">
-        <label>URL da imagem<input value={f.imageUrl} onChange={set('imageUrl')} /></label>
-        <label>Texto alternativo<input value={f.imageAlt} onChange={set('imageAlt')} /></label>
+        <label>URL da imagem<TextInput value={f.imageUrl} onChange={set('imageUrl')} /></label>
+        <label>Texto alternativo<TextInput value={f.imageAlt} onChange={set('imageAlt')} /></label>
       </div>
       <fieldset>
         <legend>Opções</legend>
         {f.options.map((o, i) => (
           <div className="opt-edit" key={o.id}>
             <b aria-hidden="true">{o.id}</b>
-            <input type="text" aria-label={`Texto da opção ${o.id}`} value={o.text} onChange={(e) => setOption(i, e.target.value)} required />
+            <TextInput type="text" aria-label={`Texto da opção ${o.id}`} value={o.text} onChange={(e) => setOption(i, e.target.value)} required />
             {o.image ? (
               <>
                 <img className="thumb" src={assetUrl(o.image.url)} alt={o.image.altText} />
                 <button type="button" className="link danger" onClick={() => setOptionImage(i, null)}>Tirar imagem</button>
               </>
             ) : (
-              <label className="upload">
-                <Icon name="image" size={20} /> Imagem
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/gif,image/webp"
-                  onChange={(e) => { uploadOptionImage(i, e.target.files[0]); e.target.value = '' }}
-                />
-              </label>
+              <FileUpload aria-label={`Imagem da opção ${o.id}`} accept="image/png,image/jpeg,image/gif,image/webp"
+                onChange={(e) => { uploadOptionImage(i, e.target.files[0]); e.target.value = '' }} />
             )}
             {/* só remove a última, para manter os ids A, B, C… sequenciais */}
             {i === f.options.length - 1 && f.options.length > 2 && (
@@ -118,7 +112,7 @@ function QuestionForm({ initial, editing, onSave, onCancel }) {
         <button type="button" className="secondary" onClick={addOption}><Icon name="plus" size={20} /> Opção</button>
       </fieldset>
       <label className="check">
-        <input type="checkbox" checked={f.active} onChange={(e) => setF({ ...f, active: e.target.checked })} />
+        <Switch checked={f.active} onChange={(e) => setF({ ...f, active: e.target.checked })} />
         Ativa
       </label>
       {error && <p className="error" role="alert">{error}</p>}

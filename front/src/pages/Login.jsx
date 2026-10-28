@@ -1,3 +1,4 @@
+import { TextInput } from '../components/form/Controls'
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
@@ -35,7 +36,7 @@ export default function Login() {
         <h1>Entrar</h1>
         {flash && <p className="ok" role="status">{flash}</p>}
         <label>Email
-          <input
+          <TextInput
             type="email"
             inputMode="email"
             autoComplete="username"

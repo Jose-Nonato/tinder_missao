@@ -1,3 +1,4 @@
+import { TextInput } from '../components/form/Controls'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
@@ -37,7 +38,7 @@ export default function Register() {
       <form className="card auth" onSubmit={submit}>
         <h1>Criar conta</h1>
         <label>Usuário
-          <input
+          <TextInput
             value={form.username}
             onChange={set('username')}
             autoComplete="username"
@@ -49,7 +50,7 @@ export default function Register() {
           />
         </label>
         <label>Email
-          <input
+          <TextInput
             type="email"
             inputMode="email"
             autoComplete="email"

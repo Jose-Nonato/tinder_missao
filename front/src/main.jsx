@@ -1,4 +1,5 @@
 import { StrictMode } from 'react'
+import { I18nProvider } from 'react-aria-components'
 import { createRoot } from 'react-dom/client'
 import '@fontsource/barlow-condensed/latin-600.css'
 import '@fontsource/barlow-condensed/latin-700.css'
@@ -10,11 +11,12 @@ import './styles/pages.css'
 import './styles/bold.css'
 import './styles/round4.css'
 import './styles/legal.css'
+import './components/form/form.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <I18nProvider locale="pt-BR"><App /></I18nProvider>
   </StrictMode>,
 )
 

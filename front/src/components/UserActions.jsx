@@ -1,3 +1,5 @@
+import Select from './form/Select'
+import { Checkbox, TextArea } from './form/Controls'
 import { useState } from 'react'
 import { api } from '../api/client'
 import Icon from './Icon'
@@ -69,19 +71,17 @@ export default function UserActions({ profile, onDone }) {
       </div>
       {reporting && (
         <form className="card report-form" onSubmit={report}>
-          <label>Motivo
-            <select value={reason} onChange={(e) => setReason(e.target.value)} required>
+          <Select label="Motivo" value={reason} onChange={(e) => setReason(e.target.value)} required>
               <option value="" disabled>Selecione</option>
               {Object.entries(REASONS).map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
-            </select>
-          </label>
+            </Select>
           <label>Detalhes (opcional)
-            <textarea value={details} onChange={(e) => setDetails(e.target.value)} maxLength={500} rows={3} />
+            <TextArea value={details} onChange={(e) => setDetails(e.target.value)} maxLength={500} rows={3} />
           </label>
           <label className="check">
-            <input type="checkbox" checked={alsoBlock} onChange={(e) => setAlsoBlock(e.target.checked)} />
+            <Checkbox checked={alsoBlock} onChange={(e) => setAlsoBlock(e.target.checked)} />
             Bloquear também
           </label>
           <div className="row">

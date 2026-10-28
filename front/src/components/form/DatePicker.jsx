@@ -24,7 +24,7 @@ export default function DatePicker({ label, helper, error, value = '', onChange,
   }
   const months = Array.from({ length: 12 }, (_, month) => new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(new Date(2000, month, 1)))
   return <I18nProvider locale="pt-BR"><div className="field date-field">
-    <label htmlFor={id}>{label}{required && <span className="field-required">Obrigatório</span>}</label>
+    <label htmlFor={id}>{label}{required && <span aria-hidden="true" className="field-required">Obrigatório</span>}</label>
     <div className="date-input-row">
       <TextInput {...props} ref={input} id={id} value={text} type="text" inputMode="numeric" placeholder="dd/mm/aaaa" maxLength={10}
         required={required} disabled={disabled} aria-invalid={Boolean(message)} aria-describedby={`${id}-help`}

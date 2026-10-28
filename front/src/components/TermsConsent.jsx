@@ -1,3 +1,4 @@
+import { Checkbox } from './form/Controls'
 import { useId, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CONSENT_ERROR } from '../legal/consent'
@@ -7,7 +8,7 @@ export default function TermsConsent({ checked, onChange }) {
   const [invalid, setInvalid] = useState(false)
   return <div className="terms-consent">
     <label className="check terms-consent-label" htmlFor={id}>
-      <input id={id} name="accept_terms" type="checkbox" required checked={checked}
+      <Checkbox id={id} name="accept_terms" required checked={checked}
         aria-invalid={invalid} aria-describedby={`${id}-description${invalid ? ` ${id}-error` : ''}`}
         onInvalid={() => setInvalid(true)}
         onChange={(event) => { setInvalid(false); onChange(event.target.checked) }} />

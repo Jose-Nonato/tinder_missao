@@ -1,3 +1,5 @@
+import { FileUpload } from '../components/form/Controls'
+import { birthDateBounds } from '../components/form/date'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, assetUrl } from '../api/client'
@@ -7,15 +9,6 @@ import ProfileSheet from '../components/ProfileSheet'
 import { Input, Select, Textarea } from '../components/Field'
 
 const MAX_PHOTOS = 3
-const MIN_AGE = 18
-
-// Data máxima aceita no campo: hoje menos 18 anos (o back valida de novo).
-const latestBirthDate = () => {
-  const d = new Date()
-  d.setFullYear(d.getFullYear() - MIN_AGE)
-  return d.toISOString().slice(0, 10)
-}
-
 const EMPTY = {
   photos: [],
   birth_date: '',
@@ -158,10 +151,9 @@ export default function Profile() {
                   <button type="button" className="photo-remove icon-btn" disabled={uploading} aria-label={`Remover foto ${i + 1}`} onClick={() => removePhoto(i)}><Icon name="x" size={18} /></button></div>
                   <div className="photo-order"><button type="button" className="secondary" disabled={i === 0 || uploading} aria-label={`Mover foto ${i + 1} para antes`} onClick={() => movePhoto(i, i - 1)}><Icon name="chevron-left" size={18} /></button><button type="button" className="secondary" disabled={i === f.photos.length - 1 || uploading} aria-label={`Mover foto ${i + 1} para depois`} onClick={() => movePhoto(i, i + 1)}><Icon name="chevron-right" size={18} /></button></div>
                 </div>)}
-                {f.photos.length < MAX_PHOTOS && <label className="photo-add profile-upload">
+                {f.photos.length < MAX_PHOTOS && <FileUpload className="photo-add profile-upload" id="profile-photos" multiple accept="image/png,image/jpeg,image/gif,image/webp" disabled={uploading} aria-describedby={photoError ? 'photo-error' : undefined} onChange={(e) => { addPhotos(e.target.files); e.target.value = '' }}>
                   <Icon name="plus" size={28} /><span>{uploading ? 'Enviando…' : 'Adicionar foto'}</span><small>Até {MAX_PHOTOS} fotos · mín. 400 px · até 2 MB</small>
-                  <input id="profile-photos" type="file" multiple accept="image/png,image/jpeg,image/gif,image/webp" disabled={uploading} aria-describedby={photoError ? 'photo-error' : undefined} onChange={(e) => { addPhotos(e.target.files); e.target.value = '' }} />
-                </label>}
+                </FileUpload>}
               </div>
               {photoError && <p className="error" id="photo-error" role="alert">{photoError}</p>}
             </section>
@@ -176,7 +168,7 @@ export default function Profile() {
           <div className="profile-column">
             <section className="card profile-section" aria-labelledby="data-title">
               <h2 id="data-title">Seus dados</h2>
-              <Input label="Data de nascimento" type="date" value={f.birth_date} onChange={set('birth_date')} max={latestBirthDate()} required helper="Você precisa ter 18 anos. No perfil, aparece apenas sua idade." />
+              <Input label="Data de nascimento" type="date" value={f.birth_date} onChange={set('birth_date')} {...birthDateBounds()} required helper="Você precisa ter 18 anos. No perfil, aparece apenas sua idade." />
               <Select label="Eu sou" value={f.gender} onChange={set('gender')} required><option value="" disabled>Selecione</option><option value="male">Masculino</option><option value="female">Feminino</option></Select>
               <Input label="Cidade" value={f.city} onChange={set('city')} maxLength={100} required autoComplete="address-level2" />
               <div className="field-pair"><Input label="Estado" value={f.state} onChange={set('state')} maxLength={100} required autoComplete="address-level1" /><Input label="País" value={f.country} onChange={set('country')} maxLength={100} required autoComplete="country-name" /></div>

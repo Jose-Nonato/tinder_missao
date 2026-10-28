@@ -1,3 +1,6 @@
+import SuspendUser from '../../components/SuspendUser'
+import Select from '../../components/form/Select'
+import { TextArea } from '../../components/form/Controls'
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
 import PhotoGallery from '../../components/PhotoGallery'
@@ -15,6 +18,7 @@ const fmt = (iso) => new Date(iso).toLocaleString('pt-BR')
 function Detail({ reportId, onChanged }) {
   const [d, setD] = useState(null)
   const [note, setNote] = useState('')
+  const [suspending, setSuspending] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [version, setVersion] = useState(0)
@@ -42,12 +46,6 @@ function Detail({ reportId, onChanged }) {
     setNote('')
   })
 
-  const suspend = () => {
-    const reason = prompt(`Motivo da suspensão de ${d.reported.username}:`)?.trim()
-    if (!reason) return
-    act(() => api.suspendUser(d.reported.id, reason))
-  }
-
   const reactivate = () => {
     if (!confirm(`Reativar a conta de ${d.reported.username}?`)) return
     act(() => api.reactivateUser(d.reported.id))
@@ -59,6 +57,7 @@ function Detail({ reportId, onChanged }) {
 
   return (
     <div className="report-detail">
+      {suspending && <SuspendUser user={d.reported} onClose={() => setSuspending(false)} onDone={() => { setVersion(v => v + 1); onChanged() }} />}
       <div className="report-profile">
         {p ? (
           <>
@@ -101,7 +100,7 @@ function Detail({ reportId, onChanged }) {
       ))}
 
       <label>Observação do administrador (opcional)
-        <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} rows={2}
+        <TextArea value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} rows={2}
           placeholder="Ex.: conferido, sem violação das regras" />
       </label>
       {error && <p className="error" role="alert">{error}</p>}
@@ -113,7 +112,7 @@ function Detail({ reportId, onChanged }) {
         {d.reported_suspended ? (
           <button disabled={busy} className="secondary" onClick={reactivate}>Reativar conta</button>
         ) : (
-          <button disabled={busy} className="danger-btn" onClick={suspend}>Suspender conta</button>
+          <button disabled={busy} className="danger-btn" onClick={() => setSuspending(true)}>Suspender conta</button>
         )}
       </div>
     </div>
@@ -148,12 +147,12 @@ export default function Reports() {
             </button>
           ))}
         </div>
-        <select value={reason} onChange={(e) => setReason(e.target.value)}>
+        <Select aria-label="Filtrar por motivo" value={reason} onChange={(e) => setReason(e.target.value)}>
           <option value="">Todos os motivos</option>
           {Object.entries(REASONS).map(([value, label]) => (
             <option key={value} value={value}>{label}</option>
           ))}
-        </select>
+        </Select>
       </div>
 
       {error && <p className="error" role="alert">{error}</p>}

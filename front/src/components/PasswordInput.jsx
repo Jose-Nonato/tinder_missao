@@ -1,3 +1,4 @@
+import { TextInput } from './form/Controls'
 import { useId, useState } from 'react'
 import Icon from './Icon'
 
@@ -10,7 +11,7 @@ export default function PasswordInput({ label, hint, error, ...inputProps }) {
     <div className="field">
       <label htmlFor={id}>{label}</label>
       <div className="password-wrap">
-        <input id={id} type={visible ? 'text' : 'password'} aria-describedby={hint ? `${id}-hint` : undefined} {...inputProps} />
+        <TextInput id={id} type={visible ? 'text' : 'password'} aria-describedby={hint ? `${id}-hint` : undefined} {...inputProps} />
         <button
           type="button"
           className="icon-btn password-toggle"

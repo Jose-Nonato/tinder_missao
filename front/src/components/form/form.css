@@ -9,7 +9,7 @@ input:-webkit-autofill { -webkit-text-fill-color: var(--c-text); box-shadow: ins
 .select-trigger[data-placeholder] { color: var(--c-text-muted); }
 .app-select[data-invalid] .select-trigger { border-color: var(--c-danger); }
 .form-popover { z-index: 100; background: var(--c-surface); color: var(--c-text); box-shadow: var(--shadow-3); border-radius: var(--r-md); overflow: auto; max-height: min(420px, var(--available-height)); min-width: var(--trigger-width); }
-.form-listbox { padding: var(--s-2); outline: none; overflow: auto; max-height: inherit; }
+.form-listbox { position: relative; padding: var(--s-2); outline: none; overflow: auto; max-height: inherit; }
 .form-option { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); min-height: 48px; padding: var(--s-3); border-radius: var(--r-sm); cursor: pointer; outline: none; }
 .form-option[data-focused] { background: var(--c-surface-2); outline: 2px solid var(--c-focus); outline-offset: -2px; }
 .form-option[data-selected] { background: var(--c-brand); color: var(--c-on-brand); font-weight: 700; }
@@ -48,7 +48,7 @@ label:has(> .choice-input) { min-height: 44px; cursor: pointer; }
 .file-upload:focus-within { outline: 2px solid var(--c-focus); outline-offset: 3px; }
 .file-upload:has(input:disabled) { opacity: .5; cursor: not-allowed; }
 @media (max-width: 600px) {
-  .form-popover { position: fixed !important; inset: auto 0 0 !important; width: 100%; min-width: 0; max-height: 70dvh; border-radius: var(--r-xl) var(--r-xl) 0 0; padding-bottom: max(var(--s-4), env(safe-area-inset-bottom)); }
+  .form-popover { position: fixed !important; inset: auto 0 0 !important; width: 100%; min-width: 0; max-height: 70dvh !important; border-radius: var(--r-xl) var(--r-xl) 0 0; padding-bottom: max(var(--s-4), env(safe-area-inset-bottom)); }
   .form-listbox { max-height: 65dvh; }
   .calendar-dialog { width: 100%; max-width: 420px; margin-inline: auto; }
   .react-aria-CalendarCell { min-height: 46px; }
@@ -57,3 +57,8 @@ label:has(> .choice-input) { min-height: 44px; cursor: pointer; }
   input.choice-input { appearance: auto; }
   .form-option[data-selected], .react-aria-CalendarCell[data-selected] { outline: 2px solid Highlight; }
 }
+/* App tables have generous padding; the calendar needs seven equal touch columns. */
+.react-aria-CalendarGrid { table-layout: fixed; min-width: 0; }
+.react-aria-CalendarGrid th, .react-aria-CalendarGrid td { padding-inline: 0; border: 0; text-align: center; }
+.react-aria-CalendarGrid tr { border: 0; }
+.form-label { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-2); font-size: .875rem; font-weight: 600; }
