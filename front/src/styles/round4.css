@@ -19,3 +19,8 @@
 .notice-content span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .unread-divider { text-align: center; color: var(--c-soft-text); background: var(--c-soft-bg); padding: var(--s-2); margin-block: var(--s-4); border-radius: var(--r-sm); font-size: .875rem; }
 @media (min-width: 1024px) { .message-notice { left: auto; top: var(--s-4); } }
+
+.install-invite { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-7); padding-block: var(--s-5); border-top: 1px solid var(--c-border); }
+.install-copy { flex: 1; min-width: 12rem; }
+.install-copy p { margin: var(--s-1) 0 0; color: var(--c-text-muted); font-size: .875rem; line-height: 1.5; }
+.install-actions { display: flex; flex-wrap: wrap; gap: var(--s-2); }

@@ -16,3 +16,10 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+
+// Nunca registra em dev: mantém o Vite/HMR livre do service worker.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* App segue online sem SW. */ })
+  }, { once: true })
+}

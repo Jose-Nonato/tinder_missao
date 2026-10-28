@@ -7,6 +7,7 @@ import Icon from './Icon'
 import Logo, { LogoMark } from './Logo'
 import Sheet from './Sheet'
 import MessageNotice from './MessageNotice'
+import InstallInvite from './InstallInvite'
 
 // Etapas obrigatórias para usuários comuns (admins ficam de fora):
 // 1) responder o questionário, 2) completar o perfil.
@@ -214,6 +215,7 @@ export function Layout() {
 
       <main id="main" className="app-main" ref={mainRef} tabIndex={-1}>
         <Outlet />
+        <InstallInvite />
       </main>
 
       {/* celular e tablet: barra de abas (no máximo 5 itens, sempre com ícone + texto) */}
