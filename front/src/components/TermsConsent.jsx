@@ -15,7 +15,7 @@ export default function TermsConsent({ checked, onChange }) {
       <span>Li e aceito os <Link className="btn-text" to="/termos" target="_blank" rel="noopener noreferrer">Termos de Uso<span className="sr-only"> (abre em nova aba)</span></Link> e a <Link className="btn-text" to="/privacidade" target="_blank" rel="noopener noreferrer">Política de Privacidade<span className="sr-only"> (abre em nova aba)</span></Link>.</span>
     </label>
     <p id={`${id}-description`} className="terms-description">
-      <strong>Consentimento para dados sensíveis.</strong> Ao marcar, consinto explicitamente com o tratamento das minhas opiniões políticas e respostas ao questionário para calcular afinidade e recomendar pessoas. Este uso é necessário para o serviço de afinidade política. Meus dados não serão usados para comunicação política, propaganda ou marketing. O projeto é independente de partidos. Posso solicitar revogação ou exclusão da conta por e-mail a duckstech@hotmail.com, pois não há essa função no app.
+      Ao marcar, consinto explicitamente com o tratamento das minhas opiniões políticas e respostas ao questionário para calcular afinidade e recomendar pessoas. Este uso é necessário para o serviço de afinidade política. Meus dados não serão usados para comunicação política, propaganda ou marketing. O projeto é independente de partidos. Posso solicitar revogação ou exclusão da conta por e-mail a duckstech@hotmail.com, pois não há essa função no app.
     </p>
     <small className="muted">Obrigatório. Os documentos abrem em nova aba.</small>
     {invalid && <p id={`${id}-error`} className="error" role="alert">{CONSENT_ERROR}</p>}
