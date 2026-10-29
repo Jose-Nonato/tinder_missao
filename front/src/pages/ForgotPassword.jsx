@@ -1,3 +1,4 @@
+import { PublicMobileHeader } from '../navigation/MobileNavigation'
 import { TextInput } from '../components/form/Controls'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -28,7 +29,7 @@ export default function ForgotPassword() {
 
   if (sentMessage) {
     return (
-      <AuthShell>
+      <><PublicMobileHeader /><AuthShell>
         <div className="card auth">
           <span className="empty-ico"><Icon name="check" size={32} /></span>
           <h1>Pedido enviado</h1>
@@ -39,12 +40,12 @@ export default function ForgotPassword() {
           </p>
           <Link to="/login" className="cta">Voltar para o login</Link>
         </div>
-      </AuthShell>
+      </AuthShell></>
     )
   }
 
   return (
-    <AuthShell>
+    <><PublicMobileHeader /><AuthShell>
       <form className="card auth" onSubmit={submit}>
         <h1>Esqueci minha senha</h1>
         <p className="muted">
@@ -74,6 +75,6 @@ export default function ForgotPassword() {
         <button className="big" disabled={busy}>{busy ? 'Enviando…' : 'Pedir redefinição'}</button>
         <p className="auth-links"><Link to="/login">Voltar para o login</Link></p>
       </form>
-    </AuthShell>
+    </AuthShell></>
   )
 }

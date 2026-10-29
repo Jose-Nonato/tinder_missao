@@ -1,3 +1,4 @@
+import { PublicMobileHeader } from '../navigation/MobileNavigation'
 import { Link } from 'react-router-dom'
 import Logo from '../components/Logo'
 import LegalLinks from '../components/LegalLinks'
@@ -29,7 +30,9 @@ const privacy = [
 export default function Legal({ privacy: isPrivacy = false }) {
   const title = isPrivacy ? 'Política de Privacidade' : 'Termos de Uso'
   const sections = isPrivacy ? privacy : terms
-  return <main className="legal-page" id="main">
+  return <>
+    <PublicMobileHeader />
+    <main className="legal-page" id="main">
     <header className="legal-header">
       <Logo size={32} />
       <Link to="/login">Entrar</Link>
@@ -46,5 +49,5 @@ export default function Legal({ privacy: isPrivacy = false }) {
       <p className="muted">Referência: <a href="https://www2.camara.leg.br/legin/fed/lei/2018/lei-13709-14-agosto-2018-787077-normaatualizada-pl.html" target="_blank" rel="noopener noreferrer">Lei Geral de Proteção de Dados (LGPD)<span className="sr-only"> (abre em nova aba)</span></a>.</p>
     </article>
     <footer><LegalLinks /><Link className="legal-back" to="/register">Ir para o cadastro</Link></footer>
-  </main>
+  </main></>
 }
