@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     supabase_url: str | None = None
     supabase_service_key: str | None = None
     supabase_bucket: str = "photos"
+    # Limpeza automática de imagens órfãs: intervalo (0 desliga) e idade mínima para apagar
+    image_cleanup_interval_hours: float = 6
+    image_cleanup_min_age_hours: float = 24
     # Origens permitidas por CORS, separadas por vírgula (ex.: https://meuapp.vercel.app)
     cors_origins: str | None = None
     # Admin inicial, criado no startup se os três estiverem definidos

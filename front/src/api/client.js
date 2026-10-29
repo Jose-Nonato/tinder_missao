@@ -151,6 +151,9 @@ export const api = {
 
   uploadImage: (file) => upload('/uploads', file),
   uploadPhoto: (file) => upload('/uploads/photos', file),
+  // Imagem tirada do formulário: o servidor só apaga se nada salvo a usa. Falha aqui não
+  // atrapalha a edição; o que sobrar sai na limpeza automática.
+  discardUpload: (url) => authed('/uploads', { method: 'DELETE', body: { url } }).catch(() => {}),
   myProfile: () => authed('/users/me/profile'),
   saveProfile: (profile) => authed('/users/me/profile', { method: 'PUT', body: profile }),
 

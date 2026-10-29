@@ -1,10 +1,12 @@
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.controllers.upload_controller import UPLOAD_DIR
+from app.core import image_cleanup
 from app.core.config import settings
 from app.core.database import client, init_indexes
 from app.core.seed import seed_admin
@@ -15,7 +17,12 @@ from app.routes import auth_routes, chat_routes, match_routes, moderation_routes
 async def lifespan(app: FastAPI):
     await init_indexes()
     await seed_admin()
+    cleanup = asyncio.create_task(image_cleanup.run_periodically()) if settings.image_cleanup_interval_hours > 0 else None
     yield
+    if cleanup:
+        cleanup.cancel()
+        with suppress(asyncio.CancelledError):
+            await cleanup
     await client.close()
 
 

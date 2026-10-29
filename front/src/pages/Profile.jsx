@@ -83,7 +83,10 @@ export default function Profile() {
   }
 
   const updatePhotos = (photos) => { setSaved(false); setPhotoError(''); setF((cur) => ({ ...cur, photos })) }
-  const removePhoto = (index) => updatePhotos(f.photos.filter((_, i) => i !== index))
+  const removePhoto = (index) => {
+    api.discardUpload(f.photos[index])
+    updatePhotos(f.photos.filter((_, i) => i !== index))
+  }
   const movePhoto = (index, to) => {
     const photos = [...f.photos]
     photos.splice(to, 0, photos.splice(index, 1)[0])

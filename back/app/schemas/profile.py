@@ -52,8 +52,7 @@ class ProfileData(BaseModel):
         # só aceita arquivos enviados pelo próprio sistema (/uploads/<arquivo> ou o bucket do Supabase)
         for url in photos:
             prefix = storage.public_prefix() if url.startswith("http") and storage.supabase_enabled() else storage.LOCAL_PREFIX
-            name = url.removeprefix(prefix)
-            if name == url or not name or "/" in name or "\\" in name or ".." in name:
+            if not storage.object_name(url, prefix):
                 raise ValueError("Foto inválida: envie as imagens pelo upload")
         if len(set(photos)) != len(photos):
             raise ValueError("Foto repetida")

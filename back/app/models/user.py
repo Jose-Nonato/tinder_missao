@@ -140,6 +140,12 @@ class UserModel:
         )
 
     @classmethod
+    async def photos_in_use(cls, urls: list[str]) -> set[str]:
+        """Quais destas URLs ainda aparecem no perfil de alguém."""
+        cursor = cls._col().find({"profile.photos": {"$in": urls}}, {"profile.photos": 1})
+        return {u async for d in cursor for u in d["profile"]["photos"] if u in urls}
+
+    @classmethod
     async def suspend(cls, user_oid, reason: str, admin_oid) -> bool:
         result = await cls._col().update_one(
             {"_id": user_oid},

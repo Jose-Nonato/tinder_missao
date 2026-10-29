@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 
-from app.controllers.upload_controller import UPLOAD_DIR
+from app.controllers.upload_controller import UPLOAD_DIR, discard_images
 from app.models.user import UserModel
 from app.schemas.profile import ProfileData, ProfileRead
 
@@ -19,4 +19,6 @@ async def save_profile(user: dict, data: ProfileData) -> ProfileData:
                 status.HTTP_422_UNPROCESSABLE_ENTITY, f"Foto não encontrada: {url}"
             )
     await UserModel.save_profile(user["_id"], data.model_dump(mode="json"))
+    old = (user.get("profile") or {}).get("photos") or []
+    await discard_images(set(old) - set(data.photos))
     return data

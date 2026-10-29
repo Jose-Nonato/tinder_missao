@@ -62,6 +62,23 @@ class QuestionModel:
         )
 
     @classmethod
-    async def delete(cls, code: str) -> bool:
-        result = await cls._col().delete_one({"code": code})
-        return result.deleted_count == 1
+    async def delete(cls, code: str) -> dict | None:
+        """Apaga e devolve a pergunta removida (None se não existia)."""
+        return await cls._col().find_one_and_delete({"code": code})
+
+    @classmethod
+    async def images_in_use(cls, urls: list[str]) -> set[str]:
+        """Quais destas URLs ainda aparecem em alguma pergunta (enunciado ou opção)."""
+        cursor = cls._col().find(
+            {"$or": [{"image.url": {"$in": urls}}, {"options.image.url": {"$in": urls}}]},
+            {"image": 1, "options": 1},
+        )
+        return {u async for d in cursor for u in image_urls(d) if u in urls}
+
+
+def image_urls(doc: dict | None) -> set[str]:
+    """URLs de imagem de uma pergunta: a do enunciado e as das opções."""
+    if not doc:
+        return set()
+    images = [doc.get("image")] + [o.get("image") for o in doc.get("options") or []]
+    return {i["url"] for i in images if i and i.get("url")}

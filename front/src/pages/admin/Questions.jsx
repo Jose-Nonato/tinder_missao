@@ -63,7 +63,14 @@ function QuestionForm({ initial, editing, onSave, onCancel }) {
     const id = String.fromCharCode(65 + f.options.length) // A, B, C…
     setF({ ...f, options: [...f.options, { id, text: '' }] })
   }
-  const removeOption = (i) => setF({ ...f, options: f.options.filter((_, j) => j !== i) })
+  const removeOptionImage = (i) => {
+    api.discardUpload(f.options[i].image.url)
+    setOptionImage(i, null)
+  }
+  const removeOption = (i) => {
+    if (f.options[i].image) api.discardUpload(f.options[i].image.url)
+    setF({ ...f, options: f.options.filter((_, j) => j !== i) })
+  }
 
   const submit = async (e) => {
     e.preventDefault()
@@ -100,7 +107,7 @@ function QuestionForm({ initial, editing, onSave, onCancel }) {
             {o.image ? (
               <>
                 <img className="thumb" src={assetUrl(o.image.url)} alt={o.image.altText} />
-                <button type="button" className="link danger" onClick={() => setOptionImage(i, null)}>Tirar imagem</button>
+                <button type="button" className="link danger" onClick={() => removeOptionImage(i)}>Tirar imagem</button>
               </>
             ) : (
               <FileUpload aria-label={`Imagem da opção ${o.id}`} accept="image/png,image/jpeg,image/gif,image/webp"

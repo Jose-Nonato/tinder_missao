@@ -9,6 +9,8 @@ import httpx
 
 from app.core import storage
 from app.core.config import settings
+from app.models.question import QuestionModel
+from app.models.user import UserModel
 from app.schemas.upload import UploadResponse
 
 UPLOAD_DIR = Path(settings.upload_dir)
@@ -73,6 +75,15 @@ async def save_image(file: UploadFile, min_side: int = 0) -> UploadResponse:
         path.unlink(missing_ok=True)
         raise
     return UploadResponse(url=f"/uploads/{path.name}")
+
+
+async def discard_images(urls) -> None:
+    """Apaga do storage as imagens descartadas que nenhum perfil ou pergunta usa mais."""
+    urls = list(set(urls))
+    if not urls:
+        return
+    in_use = await UserModel.photos_in_use(urls) | await QuestionModel.images_in_use(urls)
+    await storage.delete_objects(u for u in urls if u not in in_use)
 
 
 async def _save_remote(file: UploadFile, head: bytes, ext: str, max_bytes: int, min_side: int) -> UploadResponse:
