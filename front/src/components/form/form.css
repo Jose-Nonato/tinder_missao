@@ -14,6 +14,14 @@ input:-webkit-autofill { -webkit-text-fill-color: var(--c-text); box-shadow: ins
 .form-option[data-focused] { background: var(--c-surface-2); outline: 2px solid var(--c-focus); outline-offset: -2px; }
 .form-option[data-selected] { background: var(--c-brand); color: var(--c-on-brand); font-weight: 700; }
 .form-option[data-disabled] { opacity: .5; cursor: not-allowed; }
+.select-popover.searchable { display: flex; flex-direction: column; overflow: hidden; }
+.select-popover.searchable .form-listbox { flex: 1; min-height: 0; }
+.select-search { position: relative; display: flex; align-items: center; padding: var(--s-2) var(--s-2) 0; }
+.select-search > svg { position: absolute; left: calc(var(--s-2) + var(--s-3)); color: var(--c-text-muted); pointer-events: none; }
+/* !important: a regra base de input (com vários :not) tem especificidade maior. */
+.select-search input { width: 100%; min-height: 48px; padding-left: calc(var(--s-3) + 26px) !important; background: var(--c-bg); }
+.select-search input::-webkit-search-cancel-button { appearance: none; }
+.form-empty { padding: var(--s-3); }
 .date-input-row { position: relative; }
 .date-input-row input { padding-right: 56px !important; min-height: 52px !important; background: var(--c-bg); }
 .date-trigger { position: absolute; right: var(--s-1); top: var(--s-1); }

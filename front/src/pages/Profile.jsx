@@ -9,6 +9,7 @@ import Icon from '../components/Icon'
 import { MobileMenu } from '../navigation/MobileNavigation'
 import ProfileSheet, { ProfileContent } from '../components/ProfileSheet'
 import { Input, Select, Textarea } from '../components/Field'
+import LocationFields from '../components/form/LocationFields'
 
 const MAX_PHOTOS = 3
 const EMPTY = {
@@ -64,6 +65,7 @@ export default function Profile() {
   }, [])
 
   const set = (k) => (e) => { setSaved(false); setF({ ...f, [k]: e.target.value }) }
+  const setLocation = (changes) => { setSaved(false); setF((cur) => ({ ...cur, ...changes })) }
 
   const addPhotos = async (files) => {
     setPhotoError('')
@@ -211,8 +213,7 @@ export default function Profile() {
               <h2 id="data-title">Seus dados</h2>
               <Input label="Data de nascimento" type="date" value={f.birth_date} onChange={set('birth_date')} {...birthDateBounds()} required helper="Você precisa ter 18 anos. No perfil, aparece apenas sua idade." />
               <Select label="Eu sou" value={f.gender} onChange={set('gender')} required><option value="" disabled>Selecione</option><option value="male">Masculino</option><option value="female">Feminino</option></Select>
-              <Input label="Cidade" value={f.city} onChange={set('city')} maxLength={100} required autoComplete="address-level2" />
-              <div className="field-pair"><Input label="Estado" value={f.state} onChange={set('state')} maxLength={100} required autoComplete="address-level1" /><Input label="País" value={f.country} onChange={set('country')} maxLength={100} required autoComplete="country-name" /></div>
+              <LocationFields city={f.city} state={f.state} country={f.country} onChange={setLocation} />
             </section>
             <section className="card profile-section" aria-labelledby="preferences-title" hidden={!visible('preferences')}>
               <h2 id="preferences-title">Suas preferências</h2><p className="muted">Escolha quem você quer encontrar no Descobrir.</p>

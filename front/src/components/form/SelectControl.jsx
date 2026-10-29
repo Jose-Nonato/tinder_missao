@@ -1,5 +1,5 @@
 import { Children, useId, useState } from 'react'
-import { Select as AriaSelect, Label, Button, SelectValue, Popover, ListBox, ListBoxItem, Text, FieldError } from 'react-aria-components'
+import { Select as AriaSelect, Label, Button, SelectValue, Popover, ListBox, ListBoxItem, Text, FieldError, Autocomplete, SearchField, Input, useFilter } from 'react-aria-components'
 import Icon from '../Icon'
 
 function revealSelection(list) {
@@ -12,22 +12,31 @@ function revealSelection(list) {
 }
 
 // Accepts the existing option/value/onChange contract; the API payload stays unchanged.
-export default function SelectControl({ label, helper, error, children, value, onChange, required, disabled, placeholder = 'Selecione', id, ...props }) {
+// `searchable` adds a filter box above long lists; the value still has to be one of the options.
+export default function SelectControl({ label, helper, error, children, value, onChange, required, disabled, placeholder = 'Selecione', searchable = false, id, ...props }) {
   const generatedId = useId()
   const [root, setRoot] = useState(null)
+  const { contains } = useFilter({ sensitivity: 'base' })
   const options = Children.toArray(children).filter(Boolean)
   const empty = options.find(o => String(o.props.value) === '' && o.props.disabled)
   const items = options.filter(o => o !== empty).map(o => ({ id: String(o.props.value), text: Children.toArray(o.props.children).join(''), disabled: o.props.disabled }))
+  const list = <ListBox ref={revealSelection} shouldSelectOnPressUp={false} className="form-listbox" items={items}
+    renderEmptyState={() => <p className="form-empty muted">Nenhum resultado.</p>}>{item => <ListBoxItem className="form-option" id={item.id} textValue={item.text}>
+    {({ isSelected }) => <><span>{item.text}</span>{isSelected && <Icon name="check" size={18} />}</>}
+  </ListBoxItem>}</ListBox>
   return <AriaSelect ref={setRoot} {...props} className="field app-select" selectedKey={value === '' && empty ? null : String(value ?? '')}
     onSelectionChange={key => onChange?.({ target: { value: String(key) } })}
     isRequired={required} isDisabled={disabled} isInvalid={Boolean(error)} validationBehavior="native"
     placeholder={empty?.props.children || placeholder} disabledKeys={items.filter(o => o.disabled).map(o => o.id)}>
     {label && <Label className="form-label">{label}{required && <span aria-hidden="true" className="field-required">Obrigatório</span>}</Label>}
     <Button id={id || generatedId} className="select-trigger"><SelectValue /><Icon name="chevron-down" size={20} /></Button>
-    <Popover UNSTABLE_portalContainer={root?.closest('dialog') || undefined} className="form-popover select-popover" placement="bottom start">
-      <ListBox ref={revealSelection} shouldSelectOnPressUp={false} className="form-listbox" items={items}>{item => <ListBoxItem className="form-option" id={item.id} textValue={item.text}>
-        {({ isSelected }) => <><span>{item.text}</span>{isSelected && <Icon name="check" size={18} />}</>}
-      </ListBoxItem>}</ListBox>
+    <Popover UNSTABLE_portalContainer={root?.closest('dialog') || undefined} className={`form-popover select-popover${searchable ? ' searchable' : ''}`} placement="bottom start">
+      {searchable ? <Autocomplete filter={contains}>
+        <SearchField aria-label={`Buscar ${label?.toLowerCase() ?? 'opção'}`} className="select-search" autoFocus>
+          <Icon name="search" size={18} /><Input className="app-input" placeholder="Digite para buscar" />
+        </SearchField>
+        {list}
+      </Autocomplete> : list}
     </Popover>
     {helper && <Text slot="description" className="muted">{helper}</Text>}
     <FieldError className="error">{error || 'Selecione uma opção.'}</FieldError>
