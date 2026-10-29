@@ -1,11 +1,12 @@
+import { useMobile } from '../navigation/useMobile'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import Avatar from '../components/Avatar'
 import Icon from '../components/Icon'
 import { PhotoStack } from '../components/PhotoGallery'
-import ProfileSheet from '../components/ProfileSheet'
+import ProfileSheet, { ProfileContent } from '../components/ProfileSheet'
 import Sheet from '../components/Sheet'
 import AffinityScore from '../components/AffinityScore'
 import EmptyIllustration from '../components/EmptyIllustration'
@@ -236,6 +237,9 @@ function MatchDialog({ match, myPhoto, myName, onClose }) {
 
 export default function Discover() {
   const { user } = useAuth()
+  const mobile = useMobile()
+  const navigate = useNavigate()
+  const { profileId } = useParams()
   const [deck, setDeck] = useState([])
   const [empty, setEmpty] = useState({ reason: null, message: '' })
   const [loading, setLoading] = useState(true)
@@ -310,6 +314,12 @@ export default function Discover() {
   }
 
   const current = deck[0]
+  if (profileId) {
+    const profile = deck.find(p => p.id === profileId)
+    return profile ? <ProfileContent profile={profile} onDone={() => {
+      setDeck(d => d.filter(p => p.id !== profileId)); navigate('/discover', { replace: true })
+    }} /> : <div className="empty-state"><h2>Perfil indisponível</h2><p>Este perfil não está mais entre as suas recomendações.</p><Link to="/discover">Voltar ao Descobrir</Link></div>
+  }
   return (
     <div className="discover">
       <header className="discover-heading"><h1 className="page-title">Descobrir</h1><p>Uma conexão começa com ideias em comum.</p></header>
@@ -335,7 +345,7 @@ export default function Discover() {
               leaving={leaving}
               disabled={Boolean(leaving)}
               onSwipe={swipe}
-              onInfo={() => setInfo(true)}
+              onInfo={() => mobile ? navigate(`/discover/${current.id}`) : setInfo(true)}
             />
           </div>
           <div className="deck-actions">

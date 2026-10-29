@@ -1,13 +1,17 @@
+import { useMobile } from '../navigation/useMobile'
 import { Radio } from '../components/form/Controls'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api, assetUrl } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import { MobileMenu } from '../navigation/MobileNavigation'
 import Icon from '../components/Icon'
 import { NO_OPINION } from '../constants'
 import { firstPending } from './questionProgress'
 
 export default function Questionnaire() {
+  const mobile = useMobile()
+  const { questionCode } = useParams()
   const { user, refreshUser, logout } = useAuth()
   const navigate = useNavigate()
   // primeiro acesso: precisa responder tudo para liberar o app
@@ -18,7 +22,7 @@ export default function Questionnaire() {
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
   const questionRef = useRef(null)
-  const [step, setStep] = useState(0)
+  const [desktopStep, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
   const [completedTopic, setCompletedTopic] = useState('')
   const queue = useRef(Promise.resolve())
@@ -36,6 +40,8 @@ export default function Questionnaire() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
+
+  const step = questionCode ? Math.max(0, questions.findIndex(q => q.code === questionCode)) : desktopStep
 
   useEffect(() => { questionRef.current?.focus({ preventScroll: true }) }, [step])
 
@@ -91,6 +97,21 @@ export default function Questionnaire() {
   if (loading) return <div className="skeleton question-skeleton" aria-label="Carregando perguntas" aria-busy="true" />
   const answered = questions.filter((q) => chosen[q.code]).length
 
+  if (mobile && !questionCode) return <>
+    {required && <p className="notice">Responda todas as perguntas para começar. Cada resposta é salva automaticamente.</p>}
+    <p className="muted">{answered} de {questions.length} respondidas. Escolha uma pergunta para revisar.</p>
+    {error && <p className="error" role="alert">{error}</p>}
+    {questions.length === 0 && <p>Nenhuma pergunta disponível no momento.</p>}
+    <MobileMenu label="Perguntas do questionário" items={questions.map((q, i) => ({
+      to: `/questionnaire/${q.code}`, label: `${i + 1}. ${q.text}`,
+      description: `${q.topic} · ${chosen[q.code] ? 'Respondida' : 'A responder'}`,
+      icon: chosen[q.code] ? 'check' : 'clipboard',
+    }))} />
+    {questions.length > 0 && <button onClick={() => save()} disabled={saving || answered === 0}>{answered === questions.length ? 'Concluir' : 'Salvar agora'}</button>}
+    {required && <button className="secondary" onClick={() => save(true)} disabled={saving || answered === 0}>Salvar e continuar depois</button>}
+  </>
+  if (questionCode && !questions.some(q => q.code === questionCode)) return <p>Pergunta indisponível. <Link to="/questionnaire">Ver questionário</Link></p>
+  const goToStep = index => mobile ? navigate(`/questionnaire/${questions[index].code}`) : setStep(index)
   return (
     <>
       <h1 className="page-title">Questionário</h1>
@@ -140,9 +161,9 @@ export default function Questionnaire() {
         </section>
       ))}
       {questions.length > 0 && <div className="q-navigation">
-        <button className="secondary" disabled={step === 0} onClick={() => setStep(step - 1)}>Anterior</button>
+        <button className="secondary" disabled={step === 0} onClick={() => goToStep(step - 1)}>Anterior</button>
         <span className="muted" aria-live="polite">Pergunta {step + 1} de {questions.length}</span>
-        <button disabled={step === questions.length - 1} onClick={() => setStep(step + 1)}>Próxima</button>
+        <button disabled={step === questions.length - 1} onClick={() => goToStep(step + 1)}>Próxima</button>
       </div>}
       <div className="topic-confirmation" role="status">{completedTopic && <span key={completedTopic}><Icon name="check" size={18} /> {completedTopic} concluída</span>}</div>
       {error && <p className="error" role="alert">{error}</p>}

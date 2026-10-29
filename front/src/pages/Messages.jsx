@@ -1,3 +1,4 @@
+import { useMobile } from '../navigation/useMobile'
 import { TextInput } from '../components/form/Controls'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom'
@@ -261,10 +262,28 @@ function Thread({ other }) {
 
 export default function Messages() {
   const { userId } = useParams()
+  const mobile = useMobile()
+  const [loaded, setLoaded] = useState(false)
+  useEffect(() => {
+    if (!mobile || !userId || !window.visualViewport) return
+    const viewport = window.visualViewport
+    const update = () => {
+      document.documentElement.style.setProperty('--visual-height', `${viewport.height}px`)
+      document.documentElement.style.setProperty('--visual-top', `${viewport.offsetTop}px`)
+    }
+    update()
+    viewport.addEventListener('resize', update)
+    viewport.addEventListener('scroll', update)
+    return () => {
+      viewport.removeEventListener('resize', update); viewport.removeEventListener('scroll', update)
+      document.documentElement.style.removeProperty('--visual-height')
+      document.documentElement.style.removeProperty('--visual-top')
+    }
+  }, [mobile, userId])
   const { user: me } = useAuth()
   const { conversations, loadConversations } = useChat()
   // a lista pode ter mudado em outras telas (bloquear, desbloquear, match novo)
-  useEffect(() => { loadConversations() }, [loadConversations])
+  useEffect(() => { let active = true; loadConversations().finally(() => { if (active) setLoaded(true) }); return () => { active = false } }, [loadConversations])
   const other = conversations.find((c) => c.user.id === userId)?.user
 
   return (
@@ -275,7 +294,7 @@ export default function Messages() {
           <ConversationList conversations={conversations} me={me.id} />
         </aside>
         {userId ? (
-          other ? <Thread key={userId} other={other} /> : <div className="thread"><p className="pad muted">Carregando…</p></div>
+          other ? <Thread key={userId} other={other} /> : <div className="thread"><p className="pad muted">{loaded ? 'Conversa indisponível. Ela pode ter sido encerrada.' : 'Carregando…'}</p>{loaded && <Link to="/messages" className="pad">Voltar às conversas</Link>}</div>
         ) : (
           <div className="thread thread-empty">
             <Icon name="chat" size={40} />

@@ -1,14 +1,18 @@
 import { TextInput } from '../components/form/Controls'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import Legal from './Legal'
+import { PublicMobileHeader } from '../navigation/MobileNavigation'
 import AuthShell from '../components/AuthShell'
 import PasswordInput from '../components/PasswordInput'
 import TermsConsent from '../components/TermsConsent'
 import { registrationPayload } from '../legal/consent'
 
 export default function Register() {
+  const { '*': document } = useParams()
+  const reading = document === 'termos' || document === 'privacidade'
   const { login } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState({ username: '', email: '', password: '' })
@@ -34,6 +38,9 @@ export default function Register() {
   }
 
   return (
+    <>
+    <div hidden={reading}>
+    <PublicMobileHeader />
     <AuthShell>
       <form className="card auth" onSubmit={submit}>
         <h1>Criar conta</h1>
@@ -76,5 +83,8 @@ export default function Register() {
         <p className="auth-links">Já tem conta? <Link to="/login">Entrar</Link></p>
       </form>
     </AuthShell>
+    </div>
+    {reading && <Legal privacy={document === 'privacidade'} />}
+    </>
   )
 }

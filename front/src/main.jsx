@@ -11,6 +11,7 @@ import './styles/pages.css'
 import './styles/bold.css'
 import './styles/round4.css'
 import './styles/legal.css'
+import './styles/mobile-navigation.css'
 import './components/form/form.css'
 import App from './App.jsx'
 

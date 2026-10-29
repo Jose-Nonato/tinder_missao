@@ -1,3 +1,4 @@
+import { PublicMobileHeader } from '../navigation/MobileNavigation'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
@@ -15,13 +16,13 @@ export default function ResetPassword() {
 
   if (!token) {
     return (
-      <AuthShell>
+      <><PublicMobileHeader /><AuthShell>
         <div className="card auth">
           <h1>Link inválido</h1>
           <p>Este link de redefinição está incompleto. Peça um novo.</p>
           <Link to="/forgot-password" className="cta">Pedir novo link</Link>
         </div>
-      </AuthShell>
+      </AuthShell></>
     )
   }
 
@@ -44,7 +45,7 @@ export default function ResetPassword() {
   }
 
   return (
-    <AuthShell>
+    <><PublicMobileHeader /><AuthShell>
       <form className="card auth" onSubmit={submit}>
         <h1>Nova senha</h1>
         <PasswordInput
@@ -74,6 +75,6 @@ export default function ResetPassword() {
         <button className="big" disabled={busy}>{busy ? 'Salvando…' : 'Redefinir senha'}</button>
         <p className="muted">Por segurança, você será desconectado de todos os dispositivos.</p>
       </form>
-    </AuthShell>
+    </AuthShell></>
   )
 }

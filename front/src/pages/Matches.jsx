@@ -1,11 +1,15 @@
+import { useMobile } from '../navigation/useMobile'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { api, assetUrl } from '../api/client'
 import Icon from '../components/Icon'
 import EmptyIllustration from '../components/EmptyIllustration'
-import ProfileSheet from '../components/ProfileSheet'
+import ProfileSheet, { ProfileContent } from '../components/ProfileSheet'
 
 export default function Matches() {
+  const { profileId } = useParams()
+  const navigate = useNavigate()
+  const mobile = useMobile()
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -18,6 +22,12 @@ export default function Matches() {
       .finally(() => setLoading(false))
   }, [])
 
+  if (profileId && !loading) {
+    const profile = matches.find(m => m.profile.id === profileId)?.profile
+    return profile ? <ProfileContent profile={profile} onDone={(id, { blocked }) => {
+      if (blocked) { setMatches(list => list.filter(m => m.profile.id !== id)); navigate('/matches', { replace: true }) }
+    }} /> : <div className="empty-state"><h2>Perfil indisponível</h2><p>{error || 'Este match não está mais disponível.'}</p><Link to="/matches">Voltar aos Matches</Link></div>
+  }
   return (
     <>
       <h1 className="page-title">Matches</h1>
@@ -56,7 +66,7 @@ export default function Matches() {
                 <button
                   type="button"
                   className="icon-btn tile-more"
-                  onClick={() => setSelected(profile)}
+                  onClick={() => mobile ? navigate(`/matches/${profile.id}`) : setSelected(profile)}
                   aria-label={`Mais sobre ${profile.username}`}
                 >
                   <Icon name="more" />

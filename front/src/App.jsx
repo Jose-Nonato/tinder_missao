@@ -20,10 +20,12 @@ import Questions from './pages/admin/Questions'
 import PasswordResets from './pages/admin/PasswordResets'
 import Reports from './pages/admin/Reports'
 import Users from './pages/admin/Users'
+import { RouteEffects } from './navigation/MobileNavigation'
 
 export default function App() {
   return (
     <BrowserRouter>
+      <RouteEffects />
       <AuthProvider>
         <ChatProvider>
         <Routes>
@@ -31,28 +33,28 @@ export default function App() {
           <Route path="/termos" element={<Legal />} />
           <Route path="/privacidade" element={<Legal privacy />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register/*" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route element={<RequireAuth />}>
             <Route element={<Layout />}>
-              <Route path="/questionnaire" element={<Questionnaire />} />
+              <Route path="/questionnaire/:questionCode?" element={<Questionnaire />} />
               <Route element={<RequireQuestionnaire />}>
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/*" element={<Profile />} />
                 <Route element={<RequireProfile />}>
                   <Route path="/" element={<Home />} />
                   <Route element={<RequireAuth role="user" />}>
-                    <Route path="/discover" element={<Discover />} />
-                    <Route path="/matches" element={<Matches />} />
+                    <Route path="/discover/:profileId?" element={<Discover />} />
+                    <Route path="/matches/:profileId?" element={<Matches />} />
                     <Route path="/safety" element={<Safety />} />
                     <Route path="/blocked" element={<Blocked />} />
                     <Route path="/messages" element={<Messages />} />
                     <Route path="/messages/:userId" element={<Messages />} />
                   </Route>
                   <Route element={<RequireAuth role="admin" />}>
-                    <Route path="/admin/questions" element={<Questions />} />
+                    <Route path="/admin/questions/:questionCode?" element={<Questions />} />
                     <Route path="/admin/users" element={<Users />} />
-                    <Route path="/admin/reports" element={<Reports />} />
+                    <Route path="/admin/reports/:reportId?" element={<Reports />} />
                     <Route path="/admin/password-resets" element={<PasswordResets />} />
                   </Route>
                 </Route>

@@ -1,3 +1,4 @@
+import { useMobile } from '../navigation/useMobile'
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { api } from '../api/client'
@@ -8,6 +9,8 @@ import Logo, { LogoMark } from './Logo'
 import Sheet from './Sheet'
 import MessageNotice from './MessageNotice'
 import InstallInvite from './InstallInvite'
+import { MobileHeader } from '../navigation/MobileNavigation'
+import { screenFor } from '../navigation/screens'
 
 // Etapas obrigatórias para usuários comuns (admins ficam de fora):
 // 1) responder o questionário, 2) completar o perfil.
@@ -16,9 +19,10 @@ const mustFillProfile = (user) => user.role === 'user' && !user.profile_complete
 
 // Exige login; com `role`, exige também esse papel.
 export function RequireAuth({ role }) {
+  const location = useLocation()
   const { user, loading } = useAuth()
   if (loading) return <p className="center loading">Carregando…</p>
-  if (!user) return <Navigate to="/login" replace />
+  if (!user) return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />
   if (role && user.role !== role) return <Navigate to="/" replace />
   return <Outlet />
 }
@@ -135,8 +139,9 @@ function MoreSheet({ user, items, onClose, onLogout }) {
 
 export function Layout() {
   const { user, logout } = useAuth()
+  const mobile = useMobile()
   const { unreadTotal } = useChat()
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
   const [pendingResets, setPendingResets] = useState(0)
   const [moreOpen, setMoreOpen] = useState(false)
   const mainRef = useRef(null)
@@ -144,6 +149,7 @@ export function Layout() {
 
   const isAdmin = user.role === 'admin'
   const locked = mustAnswer(user) || mustFillProfile(user)
+  const screen = screenFor(pathname)
   const inThread = /^\/messages\/[^/]+/.test(pathname)
   const nav = buildNav(user, { unread: unreadTotal, pendingResets })
 
@@ -156,6 +162,7 @@ export function Layout() {
   // ao trocar de página, leva o foco para o conteúdo (leitores de tela); trocar de conversa não conta
   const focusKey = pathname.startsWith('/messages') ? '/messages' : pathname
   useEffect(() => {
+    if (mobile) return
     if (firstRender.current) {
       firstRender.current = false
       return
@@ -166,7 +173,7 @@ export function Layout() {
       { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180 },
     )
     return () => animation?.cancel()
-  }, [focusKey])
+  }, [focusKey, mobile])
 
   // "Mais" fica ativo quando a página atual é uma das rotas que moram nele
   const inMore = nav.secondary.some((item) => (item.end ? pathname === item.to : pathname.startsWith(item.to)))
@@ -179,12 +186,13 @@ export function Layout() {
   }
 
   return (
-    <div className={`app${inThread ? ' is-thread' : ''}${locked ? ' is-locked' : ''}`}>
+    <div className={`app${inThread ? ' is-thread' : ''}${locked ? ' is-locked' : ''}${mobile && !screen.root ? ' is-detail' : ''}`}>
       <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); mainRef.current?.focus() }}>
         Pular para o conteúdo
       </a>
 
       {/* celular e tablet: barra superior */}
+      <div className="mobile-only"><MobileHeader title={screen.title} parent={screen.parent && `${screen.parent}${pathname.startsWith('/admin/reports/') ? search : ''}`} root={screen.root || (locked && pathname === '/questionnaire')} action={locked ? <button type="button" className="link" onClick={doLogout}>Sair</button> : null} /></div>
       <header className="topbar">
         <LogoMark size={32} />
         <span className="topbar-title">{locked ? 'Complete seu cadastro' : title}</span>
@@ -223,7 +231,7 @@ export function Layout() {
       {/* celular e tablet: barra de abas (no máximo 5 itens, sempre com ícone + texto) */}
       {!locked && (
         <nav className="tabbar" aria-label="Principal">
-          {nav.primary.map((item) => (
+          {(mobile && isAdmin ? [...nav.primary.slice(0, 3), { to: '/profile', label: 'Perfil', icon: 'user' }] : nav.primary).map((item) => (
             <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `tab-item${isActive ? ' active' : ''}`}>
               <span className="tab-ico">
                 <Icon name={item.icon} />
@@ -232,7 +240,7 @@ export function Layout() {
               <span className="tab-label">{item.label}</span>
             </NavLink>
           ))}
-          <button
+          {!mobile && <button
             type="button"
             className={`tab-item tab-more${moreOpen || inMore ? ' active' : ''}`}
             onClick={() => setMoreOpen(true)}
@@ -241,7 +249,7 @@ export function Layout() {
           >
             <span className="tab-ico"><Icon name="menu" /></span>
             <span className="tab-label">Mais</span>
-          </button>
+          </button>}
         </nav>
       )}
 

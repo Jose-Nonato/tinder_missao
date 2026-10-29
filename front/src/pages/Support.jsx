@@ -1,3 +1,4 @@
+import { PublicMobileHeader } from '../navigation/MobileNavigation'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Logo from '../components/Logo'
@@ -21,7 +22,9 @@ export default function Support() {
       setFeedback('Não foi possível copiar. Selecione a chave acima e copie manualmente.')
     }
   }
-  return <main className="legal-page support-page" id="main">
+  return <>
+    <PublicMobileHeader />
+    <main className="legal-page support-page" id="main">
     <header className="legal-header">
       <Logo size={32} />
       <Link to={user ? '/' : '/login'}>{user ? 'Voltar ao início' : 'Entrar'}</Link>
@@ -61,5 +64,5 @@ export default function Support() {
       </section>
     </article>
     <footer><LegalLinks /></footer>
-  </main>
+  </main></>
 }

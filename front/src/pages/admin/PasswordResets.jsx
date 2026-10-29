@@ -1,3 +1,5 @@
+import { useSearchParams } from 'react-router-dom'
+import Select from '../../components/form/Select'
 import { TextInput } from '../../components/form/Controls'
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
@@ -41,7 +43,9 @@ function IssuedLink({ link }) {
 }
 
 export default function PasswordResets() {
-  const [status, setStatus] = useState('pending')
+  const [params, setParams] = useSearchParams()
+  const status = params.get('status') || 'pending'
+  const setStatus = value => setParams({ status: value })
   const [list, setList] = useState([])
   const [summary, setSummary] = useState(null)
   const [links, setLinks] = useState({}) // { [id]: { token, expires_at } }
@@ -84,6 +88,7 @@ export default function PasswordResets() {
         Confirme a identidade da pessoa pelo contato informado <b>antes</b> de gerar e entregar o link:
         com ele, qualquer um define a senha da conta.
       </p>
+      <div className="mobile-filter"><Select label="Situação dos pedidos" value={status} onChange={e => setStatus(e.target.value)}>{TABS.map(([key, label]) => <option key={key} value={key}>{label} {summary?.[key] ?? ''}</option>)}</Select></div>
       <div className="tabs">
         {TABS.map(([key, label]) => (
           <button key={key} className={status === key ? 'tab active' : 'tab'} onClick={() => setStatus(key)}>

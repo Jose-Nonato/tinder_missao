@@ -1,3 +1,5 @@
+import { useMobile } from '../../navigation/useMobile'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import SuspendUser from '../../components/SuspendUser'
 import Select from '../../components/form/Select'
 import { TextArea } from '../../components/form/Controls'
@@ -120,8 +122,14 @@ function Detail({ reportId, onChanged }) {
 }
 
 export default function Reports() {
-  const [status, setStatus] = useState('open')
-  const [reason, setReason] = useState('')
+  const mobile = useMobile()
+  const navigate = useNavigate()
+  const { reportId } = useParams()
+  const [params, setParams] = useSearchParams()
+  const status = params.get('status') ?? 'open'
+  const reason = params.get('reason') ?? ''
+  const setStatus = value => setParams({ status: value, reason })
+  const setReason = value => setParams({ status, reason: value })
   const [reports, setReports] = useState([])
   const [summary, setSummary] = useState(null)
   const [openId, setOpenId] = useState(null)
@@ -136,9 +144,11 @@ export default function Reports() {
 
   const count = (key) => (summary ? (key ? summary[key] : summary.open + summary.resolved + summary.dismissed) : '')
 
+  if (reportId) return <Detail reportId={reportId} onChanged={() => setVersion(v => v + 1)} />
   return (
     <>
       <h1 className="page-title">Denúncias</h1>
+      <div className="mobile-filter"><Select label="Situação das denúncias" value={status} onChange={e => setStatus(e.target.value)}>{TABS.map(([key, label]) => <option key={key} value={key}>{label} {count(key)}</option>)}</Select></div>
       <div className="row between wrap">
         <div className="tabs">
           {TABS.map(([key, label]) => (
@@ -172,7 +182,7 @@ export default function Reports() {
           <div><b>Motivo:</b> {REASONS[r.reason] ?? r.reason}</div>
           {r.details && <div className="quote">{r.details}</div>}
           <div>
-            <button className="link" onClick={() => setOpenId(openId === r.id ? null : r.id)}>
+            <button className="link" onClick={() => mobile ? navigate(`/admin/reports/${r.id}?${params}`) : setOpenId(openId === r.id ? null : r.id)}>
               {openId === r.id ? 'ocultar detalhes' : 'ver detalhes e decidir'}
             </button>
           </div>
