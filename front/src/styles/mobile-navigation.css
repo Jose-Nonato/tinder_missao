@@ -1,7 +1,7 @@
 /* Mobile uses the same ink, surfaces and typography as the desktop design. */
 .mobile-only { display: none; }
 .mobile-header { display: flex; align-items: center; gap: var(--s-3); min-height: calc(var(--topbar-h) + var(--safe-top)); padding: var(--safe-top) max(var(--s-4), var(--safe-right)) 0 max(var(--s-4), var(--safe-left)); background: var(--c-surface); border-bottom: 1px solid var(--c-border); }
-.mobile-header h1 { min-width: 0; font: 700 1.25rem/1.2 var(--font-display); text-wrap: balance; }
+.mobile-header h1 { flex: 1; min-width: 0; font: 700 1.25rem/1.2 var(--font-display); text-wrap: balance; }
 .mobile-back { display: inline-flex; flex: none; align-items: center; justify-content: center; gap: var(--s-1); min-width: 44px; min-height: 44px; padding: var(--s-2); background: transparent; color: var(--c-text); border: 0; font-size: .875rem; border-radius: var(--r-sm); cursor: pointer; }
 .mobile-back:hover { background: var(--c-surface-2); }
 .screen-menu { display: grid; margin-block: var(--s-4) var(--s-7); }
@@ -14,7 +14,7 @@
 .mobile-filter { display: none; }
 @media (max-width: 768px) {
   [hidden], .mobile-hidden { display: none !important; }
-  .mobile-only { display: block; }
+  .mobile-only { display: block; position: sticky; top: 0; z-index: var(--z-nav); }
   .app > .mobile-only { position: sticky; top: 0; z-index: var(--z-nav); }
   .topbar, .tab-more { display: none; }
   .app.is-detail .tabbar { display: none; }
@@ -41,6 +41,7 @@
   .legal-page .legal-header { display: none; }
   .legal-page { padding-top: var(--s-5); }
   .legal-document h1 { display: none; }
+  .legal-document section { scroll-margin-top: calc(var(--topbar-h) + var(--safe-top) + var(--s-4)); }
   .terms-consent a, .legal-links a { display: inline-flex; align-items: center; min-height: 44px; }
   .tabs { display: none; }
   .mobile-filter { display: block; width: 100%; margin-bottom: var(--s-4); }

@@ -8,6 +8,8 @@ test('detail screens have logical parents even on a direct entry', () => {
     ['/messages/person-1', '/messages'], ['/profile/about', '/profile'],
     ['/questionnaire/Q01', '/questionnaire'], ['/questionnaire', '/profile'],
     ['/admin/reports/abc', '/admin/reports'], ['/termos', '/register'],
+    ['/register/privacidade', '/register'], ['/profile/preview', '/profile'],
+    ['/admin/password-resets', '/profile'], ['/admin/questions/new', '/admin/questions'],
   ]) assert.equal(screenFor(path).parent, parent, path)
 })
 test('only root destinations show bottom navigation', () => {

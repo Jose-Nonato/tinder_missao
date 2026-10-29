@@ -1,11 +1,13 @@
+import { useMobile } from '../navigation/useMobile'
 import { FileUpload } from '../components/form/Controls'
 import { birthDateBounds } from '../components/form/date'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams, Navigate } from 'react-router-dom'
 import { api, assetUrl } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import Icon from '../components/Icon'
-import ProfileSheet from '../components/ProfileSheet'
+import { MobileMenu } from '../navigation/MobileNavigation'
+import ProfileSheet, { ProfileContent } from '../components/ProfileSheet'
 import { Input, Select, Textarea } from '../components/Field'
 
 const MAX_PHOTOS = 3
@@ -23,9 +25,12 @@ const EMPTY = {
 }
 
 export default function Profile() {
-  const { user, refreshUser, logoutAll } = useAuth()
+  const mobile = useMobile()
+  const { '*': section } = useParams()
+  const { user, refreshUser, logoutAll, logout } = useAuth()
   const navigate = useNavigate()
   const required = user.role === 'user' && !user.profile_completed
+  const [today] = useState(() => new Date())
   const [f, setF] = useState(EMPTY)
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -91,9 +96,9 @@ export default function Profile() {
       const profile = await api.myProfile()
       if (!profile) { setError('Salve seu perfil antes de abrir a prévia.'); return }
       const birth = profile.birth_date && new Date(`${profile.birth_date}T00:00:00`)
-      const today = new Date()
-      const age = birth ? today.getFullYear() - birth.getFullYear() - Number(today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) : null
+        const age = birth ? today.getFullYear() - birth.getFullYear() - Number(today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) : null
       setPreview({ ...profile, username: user.username, age })
+      if (mobile) navigate('/profile/preview')
     } catch (err) { setError(err.message) }
     finally { setPreviewLoading(false) }
   }
@@ -132,17 +137,50 @@ export default function Profile() {
     }
   }
 
+  const sections = [
+    { to: '/profile/photos', label: 'Suas fotos', icon: 'image', description: 'Adicionar e organizar' },
+    { to: '/profile/about', label: 'Sobre você', icon: 'edit', description: 'Descrição, profissão e universidade' },
+    { to: '/profile/data', label: 'Seus dados', icon: 'user', description: 'Nascimento e localização' },
+    { to: '/profile/preferences', label: 'Suas preferências', icon: 'compass', description: 'Quem você quer encontrar' },
+    { to: '/profile/account', label: 'Sua conta', icon: 'key', description: 'Sessões e acesso' },
+  ]
+  if (mobile && !required && !section) return <div className="profile-hub">
+    <header><h2>{user.username}</h2><p className="muted">Cuide do seu perfil e das suas conexões.</p></header>
+    <button className="secondary" onClick={showPreview} disabled={previewLoading}>Como meu perfil aparece</button>
+    {error && <p className="error" role="alert">{error}</p>}
+    <MobileMenu items={sections} />
+    <h2>Mais opções</h2>
+    <MobileMenu items={[
+      { to: '/questionnaire', label: 'Rever questionário', icon: 'clipboard' },
+      ...(user.role === 'admin' ? [{ to: '/admin/password-resets', label: 'Redefinição de senha', icon: 'key' }] : [
+        { to: '/safety', label: 'Central de segurança', icon: 'shield' },
+        { to: '/blocked', label: 'Pessoas bloqueadas', icon: 'ban' },
+      ]),
+      { to: '/apoie', label: 'Apoie o projeto', icon: 'heart' },
+      { to: '/termos', label: 'Termos de Uso', icon: 'list' },
+      { to: '/privacidade', label: 'Privacidade', icon: 'shield' },
+      { to: '/', label: 'Início', icon: 'home' },
+    ]} />
+    <button className="secondary danger-outline" onClick={logout}><Icon name="logout" />Sair da conta</button>
+  </div>
+  if (section === 'preview') {
+    const birth = f.birth_date && new Date(`${f.birth_date}T00:00:00`)
+    const age = birth ? today.getFullYear() - birth.getFullYear() - Number(today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) : null
+    return <ProfileContent profile={preview || { ...f, username: user.username, age }} preview />
+  }
+  if (section && !sections.some(s => s.to === `/profile/${section}`)) return <Navigate to="/profile" replace />
+  const visible = key => !mobile || required || section === key
   return (
     <form className="profile-form profile-editor" onSubmit={submit} aria-busy={saving}>
-      <header className="profile-heading"><div><h1 className="page-title">Meu perfil</h1><p className="muted">Seu jeito de se apresentar. Seu jeito de se conectar.</p></div><span className="tag">{user.username}</span></header>
-      <div className="profile-preview-action"><button className="secondary" type="button" onClick={showPreview} disabled={previewLoading}>{previewLoading ? 'Carregando prévia…' : 'Como meu perfil aparece'}</button><small className="muted">A prévia mostra sua última versão salva.</small></div>
-      {preview && <ProfileSheet profile={preview} preview onClose={() => setPreview(null)} />}
+      <header className={`profile-heading${mobile && !required ? ' mobile-hidden' : ''}`}><div><h1 className="page-title">Meu perfil</h1><p className="muted">Seu jeito de se apresentar. Seu jeito de se conectar.</p></div><span className="tag">{user.username}</span></header>
+      <div className={`profile-preview-action${mobile ? ' mobile-hidden' : ''}`}><button className="secondary" type="button" onClick={showPreview} disabled={previewLoading}>{previewLoading ? 'Carregando prévia…' : 'Como meu perfil aparece'}</button><small className="muted">A prévia mostra sua última versão salva.</small></div>
+      {!mobile && preview && <ProfileSheet profile={preview} preview onClose={() => setPreview(null)} />}
       {required && <p className="notice" role="status">Quase lá! Complete seu perfil para começar a ver pessoas.</p>}
       <fieldset className="profile-fields" disabled={saving}>
         <legend className="sr-only">Editar meu perfil</legend>
         <div className="profile-columns">
           <div className="profile-column">
-            <section className="card profile-section" aria-labelledby="photos-title">
+            <section className="card profile-section" aria-labelledby="photos-title" hidden={!visible('photos')}>
               <div className="row between"><h2 id="photos-title">Suas fotos</h2><span className="muted">{f.photos.length} / {MAX_PHOTOS}</span></div>
               <p className="muted">A primeira é sua foto principal. Use as setas para organizar a ordem.</p>
               <div className="profile-gallery" ref={gallery}>
@@ -157,7 +195,7 @@ export default function Profile() {
               </div>
               {photoError && <p className="error" id="photo-error" role="alert">{photoError}</p>}
             </section>
-            <section className="card profile-section" aria-labelledby="about-title">
+            <section className="card profile-section" aria-labelledby="about-title" hidden={!visible('about')}>
               <h2 id="about-title">Sobre você</h2>
               <Textarea label="Descrição" value={f.description} onChange={set('description')} maxLength={500} rows={5} required placeholder="Fale um pouco sobre você" helper="Conte o que você gosta de fazer e o que faz uma conversa valer a pena." />
               <span className="bio-count" aria-label={`${f.description.length} de 500 caracteres`}>{f.description.length} / 500</span>
@@ -166,25 +204,25 @@ export default function Profile() {
             </section>
           </div>
           <div className="profile-column">
-            <section className="card profile-section" aria-labelledby="data-title">
+            <section className="card profile-section" aria-labelledby="data-title" hidden={!visible('data')}>
               <h2 id="data-title">Seus dados</h2>
               <Input label="Data de nascimento" type="date" value={f.birth_date} onChange={set('birth_date')} {...birthDateBounds()} required helper="Você precisa ter 18 anos. No perfil, aparece apenas sua idade." />
               <Select label="Eu sou" value={f.gender} onChange={set('gender')} required><option value="" disabled>Selecione</option><option value="male">Masculino</option><option value="female">Feminino</option></Select>
               <Input label="Cidade" value={f.city} onChange={set('city')} maxLength={100} required autoComplete="address-level2" />
               <div className="field-pair"><Input label="Estado" value={f.state} onChange={set('state')} maxLength={100} required autoComplete="address-level1" /><Input label="País" value={f.country} onChange={set('country')} maxLength={100} required autoComplete="country-name" /></div>
             </section>
-            <section className="card profile-section" aria-labelledby="preferences-title">
+            <section className="card profile-section" aria-labelledby="preferences-title" hidden={!visible('preferences')}>
               <h2 id="preferences-title">Suas preferências</h2><p className="muted">Escolha quem você quer encontrar no Descobrir.</p>
               <Select label="Quero ver" value={f.interested_in} onChange={set('interested_in')} required><option value="" disabled>Selecione</option><option value="men">Homens</option><option value="women">Mulheres</option><option value="both">Ambos</option></Select>
             </section>
-            <section className="card profile-section profile-account" aria-labelledby="account-title">
+            <section className="card profile-section profile-account" aria-labelledby="account-title" hidden={!visible('account')}>
               <h2 id="account-title">Sua conta</h2><p className="muted">Use esta opção se perdeu um aparelho ou acha que alguém acessou a sua conta.</p><button type="button" className="secondary" onClick={signOutEverywhere}>Sair de todos os dispositivos</button>
             </section>
           </div>
         </div>
       </fieldset>
       {error && <p className="error" role="alert">{error}</p>}
-      <div className="sticky-actions profile-save">
+      <div className={`sticky-actions profile-save${mobile && section === 'account' ? ' mobile-hidden' : ''}`}>
         <span className={`grow${saved ? ' saved' : ''}`} role="status">{saving ? 'Salvando alterações…' : uploading ? 'Enviando fotos…' : saved ? 'Perfil salvo!' : 'Tudo pronto? Salve seu perfil.'}</span>
         <button className="big" disabled={uploading || saving}>{saving ? 'Salvando…' : saved ? 'Salvo' : 'Salvar perfil'}<Icon name={saved ? 'check' : 'arrow-right'} size={20} /></button>
       </div>

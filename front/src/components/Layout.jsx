@@ -19,9 +19,10 @@ const mustFillProfile = (user) => user.role === 'user' && !user.profile_complete
 
 // Exige login; com `role`, exige também esse papel.
 export function RequireAuth({ role }) {
+  const location = useLocation()
   const { user, loading } = useAuth()
   if (loading) return <p className="center loading">Carregando…</p>
-  if (!user) return <Navigate to="/login" replace />
+  if (!user) return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />
   if (role && user.role !== role) return <Navigate to="/" replace />
   return <Outlet />
 }
@@ -140,7 +141,7 @@ export function Layout() {
   const { user, logout } = useAuth()
   const mobile = useMobile()
   const { unreadTotal } = useChat()
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
   const [pendingResets, setPendingResets] = useState(0)
   const [moreOpen, setMoreOpen] = useState(false)
   const mainRef = useRef(null)
@@ -191,7 +192,7 @@ export function Layout() {
       </a>
 
       {/* celular e tablet: barra superior */}
-      <div className="mobile-only"><MobileHeader title={screen.title} parent={screen.parent} root={screen.root || (locked && pathname === '/questionnaire')} /></div>
+      <div className="mobile-only"><MobileHeader title={screen.title} parent={screen.parent && `${screen.parent}${pathname.startsWith('/admin/reports/') ? search : ''}`} root={screen.root || (locked && pathname === '/questionnaire')} action={locked ? <button type="button" className="link" onClick={doLogout}>Sair</button> : null} /></div>
       <header className="topbar">
         <LogoMark size={32} />
         <span className="topbar-title">{locked ? 'Complete seu cadastro' : title}</span>

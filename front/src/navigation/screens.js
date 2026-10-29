@@ -2,12 +2,13 @@ const roots = {
   '/': 'Início', '/discover': 'Descobrir', '/matches': 'Matches',
   '/messages': 'Mensagens', '/profile': 'Meu perfil',
   '/admin/questions': 'Perguntas', '/admin/users': 'Usuários',
-  '/admin/reports': 'Denúncias', '/admin/password-resets': 'Redefinição de senha',
+  '/admin/reports': 'Denúncias',
 }
 const details = {
   '/profile/photos': 'Suas fotos', '/profile/about': 'Sobre você',
   '/profile/data': 'Seus dados', '/profile/preferences': 'Suas preferências',
   '/profile/account': 'Sua conta', '/profile/preview': 'Prévia do perfil',
+  '/admin/password-resets': 'Redefinição de senha',
   '/questionnaire': 'Questionário', '/safety': 'Central de segurança', '/blocked': 'Bloqueados',
   '/termos': 'Termos de Uso', '/privacidade': 'Política de Privacidade',
   '/apoie': 'Apoie o projeto', '/register': 'Criar conta',
@@ -21,9 +22,11 @@ export function screenFor(path) {
   if (/^\/(discover|matches|messages)\//.test(path)) {
     parent = `/${path.split('/')[1]}`
     title = path.startsWith('/messages/') ? 'Conversa' : 'Perfil e afinidade'
+  } else if (path === '/admin/password-resets') {
+    parent = '/profile'
   } else if (path.startsWith('/admin/')) {
     parent = '/' + path.split('/').slice(1, 3).join('/')
-    title = path.startsWith('/admin/reports/') ? 'Analisar denúncia' : 'Editar pergunta'
+    title = path.startsWith('/admin/reports/') ? 'Analisar denúncia' : path.endsWith('/new') ? 'Nova pergunta' : 'Editar pergunta'
   } else if (path.startsWith('/questionnaire/')) {
     parent = '/questionnaire'
     title = 'Responder pergunta'

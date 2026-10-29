@@ -10,13 +10,15 @@ import PasswordInput from '../components/PasswordInput'
 export default function Login() {
   const { user, login } = useAuth()
   const navigate = useNavigate()
-  const flash = useLocation().state?.message // ex.: "Senha redefinida"
+  const { state } = useLocation()
+  const destination = state?.from?.startsWith('/') && !state.from.startsWith('//') ? state.from : '/'
+  const flash = state?.message // ex.: "Senha redefinida"
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  if (user) return <Navigate to="/" replace />
+  if (user) return <Navigate to={destination} replace />
 
   const submit = async (e) => {
     e.preventDefault()
@@ -24,7 +26,7 @@ export default function Login() {
     setBusy(true)
     try {
       await login(email, password)
-      navigate('/')
+      navigate(destination, { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {

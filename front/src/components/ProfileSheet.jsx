@@ -7,9 +7,14 @@ import UserActions from './UserActions'
 // Perfil completo de outra pessoa, em uma folha: fotos, informações, compatibilidade e
 // ações de segurança. Usado em Descobrir e em Matches.
 export default function ProfileSheet({ profile, onClose, onDone, preview = false }) {
+  return <Sheet title={profile.username} onClose={onClose} size="lg">
+    <ProfileContent profile={profile} onDone={onDone} preview={preview} />
+  </Sheet>
+}
+
+export function ProfileContent({ profile, onDone, preview = false }) {
   const place = [profile.city, profile.state, profile.country].filter(Boolean).join(', ')
   return (
-    <Sheet title={profile.username} onClose={onClose} size="lg">
       <div className="ps-grid">
         <PhotoGallery photos={profile.photos} name={profile.username} />
         <div className="ps-info">
@@ -37,6 +42,5 @@ export default function ProfileSheet({ profile, onClose, onDone, preview = false
           <UserActions profile={profile} onDone={(id, res) => onDone?.(id, res)} />
         </div>}
       </div>
-    </Sheet>
   )
 }

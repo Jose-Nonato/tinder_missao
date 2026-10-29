@@ -13,7 +13,7 @@ export function BackButton({ parent, className = 'mobile-back', children }) {
   }}><Icon name="arrow-left" />{children || <span>Voltar</span>}</button>
 }
 
-export function MobileHeader({ title, parent, root = false }) {
+export function MobileHeader({ title, parent, root = false, action }) {
   const heading = useRef(null)
   const mobile = useMobile()
   useEffect(() => {
@@ -24,6 +24,7 @@ export function MobileHeader({ title, parent, root = false }) {
   return <header className="mobile-header">
     {!root && <BackButton parent={parent} />}
     <h1 tabIndex={-1} ref={heading} data-screen-title>{title}</h1>
+    {action}
   </header>
 }
 
