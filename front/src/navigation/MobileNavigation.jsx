@@ -5,12 +5,12 @@ import { canGoBack, screenFor } from './screens'
 
 import { useMobile } from './useMobile'
 
-export function BackButton({ parent, className = 'mobile-back', children }) {
+export function BackButton({ parent, className = 'mobile-back' }) {
   const navigate = useNavigate()
   return <button type="button" className={className} aria-label="Voltar" onClick={() => {
     if (canGoBack(window.history.state)) navigate(-1)
     else navigate(parent || '/profile', { replace: true })
-  }}><Icon name="arrow-left" />{children || <span>Voltar</span>}</button>
+  }}><Icon name="arrow-left" /></button>
 }
 
 export function MobileHeader({ title, parent, root = false, action }) {
