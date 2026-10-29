@@ -19,7 +19,7 @@
   .topbar, .tab-more { display: none; }
   .app.is-detail .tabbar { display: none; }
   .app.is-detail .app-main { padding-bottom: calc(var(--s-7) + var(--safe-bottom)); }
-  .app-main > .page-title, .discover-heading > .page-title, .profile-heading .page-title { display: none; }
+  .app-main .page-title, .discover-heading > .page-title, .profile-heading .page-title { display: none; }
   .app-main { padding-top: var(--s-4); }
   .profile-columns, .profile-column { display: contents; }
   .profile-section { margin-bottom: var(--s-4); }

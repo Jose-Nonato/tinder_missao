@@ -1,3 +1,6 @@
+import { useNavigate, useParams } from 'react-router-dom'
+import { useMobile } from '../../navigation/useMobile'
+import { canGoBack } from '../../navigation/screens'
 import Select from '../../components/form/Select'
 import { TextInput, Switch, FileUpload } from '../../components/form/Controls'
 import { useEffect, useState } from 'react'
@@ -125,11 +128,23 @@ function QuestionForm({ initial, editing, onSave, onCancel }) {
 }
 
 export default function Questions() {
+  const mobile = useMobile()
+  const navigate = useNavigate()
+  const { questionCode } = useParams()
   const [list, setList] = useState([])
-  const [form, setForm] = useState(null) // { initial, editing } | null
+  const [loaded, setLoaded] = useState(false)
+  const [desktopForm, setDesktopForm] = useState(null) // { initial, editing } | null
+  const question = list.find(q => q.code === questionCode)
+  const form = questionCode ? (questionCode === 'new' ? { initial: EMPTY, editing: false } : question ? { initial: toForm(question), editing: true } : null) : desktopForm
+  const setForm = next => {
+    if (!mobile) { setDesktopForm(next); return }
+    if (next) navigate(`/admin/questions/${next.editing ? next.initial.code : 'new'}`)
+    else if (canGoBack(window.history.state)) navigate(-1)
+    else navigate('/admin/questions', { replace: true })
+  }
   const [error, setError] = useState('')
 
-  const load = () => api.listQuestions().then(setList).catch((e) => setError(e.message))
+  const load = () => api.listQuestions().then(setList).catch((e) => setError(e.message)).finally(() => setLoaded(true))
   useEffect(() => { load() }, [])
 
   const save = async (f) => {
@@ -154,6 +169,8 @@ export default function Questions() {
     } catch (e) { setError(e.message) }
   }
 
+  if (questionCode && !form) return <p role={error ? 'alert' : 'status'}>{error || (loaded ? 'Pergunta indisponível.' : 'Carregando pergunta…')}</p>
+
   return (
     <>
       <div className="row between">
@@ -167,13 +184,14 @@ export default function Questions() {
       {error && <p className="error" role="alert">{error}</p>}
       {form && (
         <QuestionForm
+          key={questionCode || form.initial.code || 'new'}
           initial={form.initial}
           editing={form.editing}
           onSave={save}
           onCancel={() => setForm(null)}
         />
       )}
-      <div className="table-wrap">
+      <div className="table-wrap" hidden={mobile && Boolean(questionCode)}>
         <table className="table-cards">
           <caption className="sr-only">Perguntas cadastradas</caption>
           <thead>
