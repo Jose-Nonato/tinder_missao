@@ -333,6 +333,9 @@ export default function Discover() {
 
       {current ? (
         <>
+          {current.revisiting && (
+            <p className="notice revisit-notice">Você já viu todos os perfis novos. Agora está revendo quem você pulou.</p>
+          )}
           <div className="deck">
             {deck[1] && (
               <div className="swipe-card behind" aria-hidden="true">

@@ -19,10 +19,15 @@ class SwipeModel:
         )
 
     @classmethod
-    async def swiped_ids(cls, from_id) -> list:
-        """Ids que o usuário já curtiu ou descartou."""
-        cursor = cls._col().find({"from_id": from_id}, {"to_id": 1})
-        return [s["to_id"] async for s in cursor]
+    async def history(cls, from_id) -> tuple[set, dict]:
+        """(ids curtidos, {id descartado: quando}) pelo usuário."""
+        liked, passed = set(), {}
+        async for s in cls._col().find({"from_id": from_id}, {"to_id": 1, "action": 1, "created_at": 1}):
+            if s["action"] == "like":
+                liked.add(s["to_id"])
+            else:
+                passed[s["to_id"]] = s["created_at"]
+        return liked, passed
 
     @classmethod
     async def liked_me(cls, from_id, to_id) -> dict | None:

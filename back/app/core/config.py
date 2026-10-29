@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     # Limpeza automática de imagens órfãs: intervalo (0 desliga) e idade mínima para apagar
     image_cleanup_interval_hours: float = 6
     image_cleanup_min_age_hours: float = 24
+    # Dias até um perfil descartado voltar às recomendações (depois dos perfis novos)
+    pass_cooldown_days: int = 1
     # Origens permitidas por CORS, separadas por vírgula (ex.: https://meuapp.vercel.app)
     cors_origins: str | None = None
     # Admin inicial, criado no startup se os três estiverem definidos

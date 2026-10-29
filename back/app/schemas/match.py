@@ -40,6 +40,7 @@ class ProfileResponse(BaseModel):
     city: str = ""
     state: str = ""
     country: str = ""
+    revisiting: bool = False  # já foi descartado antes e voltou na repescagem
 
 
 class SwipeResponse(BaseModel):
@@ -56,7 +57,7 @@ class EmptyReason(str, Enum):
     NO_ANSWERS = "no_answers"  # tudo "não tenho opinião": não há como comparar
     NO_USERS = "no_users"  # ninguém mais cadastrado e elegível
     NO_PREFERENCE_MATCH = "no_preference_match"  # ninguém combina com as preferências (dos dois lados)
-    ALL_SEEN = "all_seen"  # já curtiu, descartou ou bloqueou todo mundo disponível
+    ALL_SEEN = "all_seen"  # já curtiu ou bloqueou todo mundo, ou os descartados ainda estão na carência
     NO_COMMON_QUESTIONS = "no_common_questions"  # há gente, mas sem perguntas respondidas em comum
 
 

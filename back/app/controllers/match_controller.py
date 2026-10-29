@@ -1,10 +1,12 @@
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
+from math import ceil
 
 from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import HTTPException, status
 
 from app.core.age import age_on
+from app.core.config import settings
 from app.core.roles import Role
 from app.models.block import BlockModel
 from app.models.question import QuestionModel
@@ -134,24 +136,44 @@ async def recommendations(user: dict, limit: int) -> RecommendationsResponse:
             f"{_WHO_SEES[my_profile['gender']]}. Você pode ajustar isso no seu perfil.",
         )
 
-    seen = {*await SwipeModel.swiped_ids(user["_id"]), *await BlockModel.hidden_ids(user["_id"])}
-    unseen = [other for other in pool if other["_id"] not in seen]
-    if not unseen:
+    # Curtidos e bloqueados nunca voltam; descartados voltam depois da carência (repescagem).
+    liked, passed = await SwipeModel.history(user["_id"])
+    hidden = liked | await BlockModel.hidden_ids(user["_id"])
+    available = [other for other in pool if other["_id"] not in hidden]
+    cutoff = datetime.now(timezone.utc) - timedelta(days=settings.pass_cooldown_days)
+    fresh = [other for other in available if other["_id"] not in passed]
+    due = [other for other in available if other["_id"] in passed and passed[other["_id"]] <= cutoff]
+    if not fresh and not due:
+        cooling = [passed[other["_id"]] for other in available]
+        if not cooling:
+            return _empty(
+                EmptyReason.ALL_SEEN,
+                "Você já avaliou (ou bloqueou) todas as pessoas disponíveis. Volte mais tarde para ver novos perfis!",
+            )
+        days = max(1, ceil((min(cooling) - cutoff) / timedelta(days=1)))
         return _empty(
             EmptyReason.ALL_SEEN,
-            "Você já avaliou (ou bloqueou) todas as pessoas disponíveis. Volte mais tarde para ver novos perfis!",
+            f"Você já viu todos os perfis novos. Quem você pulou volta a aparecer em "
+            f"{days} {'dia' if days == 1 else 'dias'}, ou antes, se chegar gente nova.",
         )
 
-    profiles = [p for other in unseen if (p := _profile(other, mine, active))]
+    # mais compatíveis primeiro; em empate, quem tem mais perguntas em comum
+    profiles = sorted(
+        (p for other in fresh if (p := _profile(other, mine, active))),
+        key=lambda p: (p.compatibility, p.common_questions),
+        reverse=True,
+    )
+    # depois, a repescagem: quem foi descartado há mais tempo primeiro
+    for other in sorted(due, key=lambda o: passed[o["_id"]]):
+        if p := _profile(other, mine, active):
+            p.revisiting = True
+            profiles.append(p)
     if not profiles:
         return _empty(
             EmptyReason.NO_COMMON_QUESTIONS,
             "Há pessoas disponíveis, mas nenhuma respondeu (com opinião) as mesmas perguntas que você. "
             "Responder mais perguntas aumenta as chances de aparecer alguém.",
         )
-
-    # mais compatíveis primeiro; em empate, quem tem mais perguntas em comum
-    profiles.sort(key=lambda p: (p.compatibility, p.common_questions), reverse=True)
     return RecommendationsResponse(profiles=profiles[:limit])
 
 
