@@ -19,7 +19,7 @@ export function MobileHeader({ title, parent, root = false, action }) {
   useEffect(() => {
     if (!mobile || !heading.current?.getClientRects().length) return
     heading.current.focus({ preventScroll: true })
-    document.title = `${title} · Voto a dois`
+    document.title = `${title} · Missão a Dois`
   }, [title, mobile])
   return <header className="mobile-header">
     {!root && <BackButton parent={parent} />}
@@ -81,7 +81,7 @@ export function RouteEffects() {
     if (!mobile) return
     const title = [...document.querySelectorAll('[data-screen-title]')].find(el => el.getClientRects().length)
     title?.focus({ preventScroll: true })
-    document.title = `${title?.textContent || screenFor(location.pathname).title} · Voto a dois`
+    document.title = `${title?.textContent || screenFor(location.pathname).title} · Missão a Dois`
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const content = [...document.querySelectorAll('.app-main, .legal-document, .auth-card-wrap')].find(el => el.getClientRects().length)
     const animation = content?.animate(

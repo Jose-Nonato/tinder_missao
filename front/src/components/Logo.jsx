@@ -1,15 +1,12 @@
-// Balões da opção 1: curvas do original, com o coração em espaço negativo.
-// A mesma geometria é usada em public/icons/brand.svg e nos ícones de instalação.
+// A onça (public/logo_onca.png) em versão leve; os ícones de instalação e o favicon saem do mesmo arquivo.
 export function LogoMark({ size = 36 }) {
-  return <svg viewBox="80 80 352 352" width={size} height={size} className="logo-mark" aria-hidden="true" focusable="false">
-    <rect x="80" y="80" width="352" height="352" rx="44" fill="var(--c-brand)" />
-    <path fill="currentColor" d="M263 191 C245 174 222 165 200 165 C151 165 112 201 112 247 C112 268 120 287 134 302 L125 332 Q123 340 132 337 L166 323 C194 334 226 329 253 310 C228 290 200 264 200 241 C200 224 212 210 228 210 C240 210 251 218 256 229 C261 218 272 210 283 210 C299 210 311 224 311 241 C311 267 283 294 255 312 C280 335 314 343 345 331 L380 346 Q389 350 386 340 L378 309 C392 294 400 275 400 255 C400 210 363 174 318 174 C297 174 279 180 263 191 Z" />
-  </svg>
+  // padding em % no CSS seria relativo ao pai; aqui acompanha o tamanho do selo.
+  return <img src="/icons/logo.webp" width={size} height={size} className="logo-mark" style={{ padding: Math.round(size * 0.08) }} alt="" draggable="false" />
 }
 
 export default function Logo({ size = 36, text = true, className = '' }) {
-  return <span className={`logo ${className}`.trim()} role={text ? undefined : 'img'} aria-label={text ? undefined : 'Voto a dois'}>
+  return <span className={`logo ${className}`.trim()} role={text ? undefined : 'img'} aria-label={text ? undefined : 'Missão a Dois'}>
     <LogoMark size={size} />
-    {text && <span className="logo-text">Voto a dois</span>}
+    {text && <span className="logo-text">Missão a Dois</span>}
   </span>
 }

@@ -28,10 +28,15 @@
   font-weight: 800;
   letter-spacing: -0.02em;
 }
+/* A onça é amarela: o selo claro (igual ao dos ícones de instalação) a mantém legível
+   sobre o amarelo da marca e no tema escuro. */
 .logo-mark {
   display: block;
-  color: var(--c-on-brand);
   flex: none;
+  box-sizing: border-box;
+  border-radius: 24%;
+  background: #f6f5f0;
+  object-fit: contain;
 }
 
 /* ---------- avatar / distintivos / tags ---------- */
